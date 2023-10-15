@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+    database:
+        image: mariadb
+        restart: always
+        ports:
+            - "3308:3306"
+        volumes:
+            - ./migrations/01-create-table.up.sql:/docker-entrypoint-initdb.d/migration.sql
+        environment:
+            MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
+            MARIADB_DATABASE: ${MARIADB_DATABASE:-chatbdd}
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MARIADB_ROOT_PASSWORD" ]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+    go-api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: on-failure
+        environment:
+            MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
+            MARIADB_DATABASE: ${MARIADB_DATABASE:-chatbdd}
+        ports:
+            - "8000:8000"
+        depends_on:
+            database:
+                condition: service_healthy
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - "8080:8080"
+
+
