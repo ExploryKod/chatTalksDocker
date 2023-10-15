@@ -22,8 +22,8 @@ RUN go mod download \
 FROM mariadb:latest
 
 # Définir les variables d'environnement pour la base de données
-ENV MYSQL_ROOT_PASSWORD=password
-ENV MYSQL_DATABASE=chatbdd
+ENV MARIADB_ROOT_PASSWORD=password
+ENV MARIADB_DATABASE=chatbdd
 
 # Copier le binaire de l'application Go depuis le stage précédent
 COPY --from=BUILDER /build/buildedApp /app/buildedApp
