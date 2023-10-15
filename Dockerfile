@@ -15,6 +15,7 @@ RUN go mod download \
     && go mod verify \
     && go build -o /build/buildedApp main/main.go
 
+
 FROM scratch as FINAL
 
 WORKDIR /main
