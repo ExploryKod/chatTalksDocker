@@ -165,7 +165,9 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 				Value: token,
 			})
 			// Successful login
-			http.Redirect(w, r, "/profile", http.StatusSeeOther)
+
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/profile"}
+			jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
 			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{

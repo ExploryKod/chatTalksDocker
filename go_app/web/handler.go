@@ -3,6 +3,7 @@ package web
 import (
 	database "demoHTTP/mysql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -41,7 +42,10 @@ func NewHandler(store *database.Store) *Handler {
 
 	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
-		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {})
+
+		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Println("profile ok")
+		})
 	})
 
 	handler.Get("/", handler.WebShowTodos())
