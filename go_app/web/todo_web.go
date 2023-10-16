@@ -166,8 +166,12 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			})
 			// Successful login
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/profile"}
-			jsonResponse(w, http.StatusOK, response)
+			response := map[string]string{
+				"message":  "Vous êtes bien connecté",
+				"redirect": "/dashboard",
+				"token":    token,
+			}
+			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
 			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{
