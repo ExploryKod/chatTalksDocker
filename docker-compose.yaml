@@ -30,7 +30,7 @@ services:
         depends_on:
             database:
                 condition: service_healthy
-
+    
     adminer:
         image: adminer
         restart: always
