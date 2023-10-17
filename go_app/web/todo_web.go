@@ -130,8 +130,35 @@ func MakeToken(name string) string {
 	return tokenString
 }
 
+func loginJWTHandler(w http.ResponseWriter, r *http.Request) {
+	username, password, ok := r.BasicAuth()
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Perform authentication (e.g., check credentials against a database)
+	if isValidCredentials(username, password) {
+		// Generate a JWT
+		_, tokenString, _ := tokenAuth.Encode(jwt.MapClaims{"username": username, "exp": time.Now().Add(time.Hour).Unix()})
+
+		// Respond with the JWT
+		response := map[string]string{"token": tokenString}
+		json.NewEncoder(w).Encode(response)
+	} else {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	}
+}
+
+func isValidCredentials(username, password string) bool {
+	// Implement your authentication logic here (e.g., check against a database)
+	// Return true if the credentials are valid, otherwise false.
+	return true
+}
+
 func (h *Handler) LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		// Extract username and password from the request body or form data
 		username := r.FormValue("username")
 		password := r.FormValue("password")
@@ -166,7 +193,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			})
 			// Successful login
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/profile"}
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/profile", "token": token}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
