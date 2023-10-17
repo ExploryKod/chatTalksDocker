@@ -16,7 +16,14 @@ Je ne l'ai pas intégrer au docker.
 docker compose up -d --build
 ```
 
+Aller ensuite consulter la BDD sur: localhost:8080
+- Serveur: database
+- Utilisateur: root
+- Mot de passe: password
+- Nom de le base de donnée: chabdd
+
 ***Dev Local sans docker*** en allant dans go_app (et non depuis la racine) : 
+! La BDD ne sera pas disponible et les requêtes ne seront donc pas valide > fix en cours.
 
 ```
 go mod tidy
