@@ -41,7 +41,6 @@ func NewHandler(store *database.Store) *Handler {
 
 	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
-		r.Post("/auth/user-list", handler.GetUsers())
 	})
 
 	return handler
