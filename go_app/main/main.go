@@ -27,7 +27,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
 
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)

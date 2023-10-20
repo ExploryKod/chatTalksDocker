@@ -119,7 +119,7 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 var tokenAuth *jwtauth.JWTAuth
 
-const Secret = "mysecretamaury"
+const Secret = "mysecretamaurynass"
 
 func init() {
 	tokenAuth = jwtauth.New("HS256", []byte(Secret), nil)

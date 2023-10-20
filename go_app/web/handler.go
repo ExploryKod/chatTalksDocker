@@ -3,6 +3,7 @@ package web
 import (
 	database "demoHTTP/mysql"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -19,6 +20,10 @@ import (
 // const Secret = "42a00d84-9914-4a77-b6bd-d2a9d09c6795"
 
 func NewHandler(store *database.Store) *Handler {
+	flag.Parse()
+	hub := newHub()
+	go hub.run()
+
 	handler := &Handler{
 		chi.NewRouter(),
 		store,
@@ -47,6 +52,13 @@ func NewHandler(store *database.Store) *Handler {
 			fmt.Println("profile ok")
 		})
 	})
+
+	handler.Get(
+		"/ws",
+		func(w http.ResponseWriter, r *http.Request) {
+			handler.HandleWebsocket(hub, w, r)
+		},
+	)
 
 	handler.Get("/", handler.WebShowTodos())
 	handler.Get("/create-todo", handler.WebCreateTodoForm())
