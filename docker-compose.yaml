@@ -16,25 +16,46 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
+    postgredb:
+        container_name: pg_container
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: test_db
+        ports:
+        - "5432:5432"
+    pgadmin:
+        container_name: pgadmin4_container
+        image: dpage/pgadmin4
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@admin.com
+            PGADMIN_DEFAULT_PASSWORD: root
+        ports:
+        - "5050:80"
 
     go-api:
         build:
             context: .
             dockerfile: Dockerfile
-        restart: on-failure
+        restart: always
+        tty: true
         environment:
             MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
             MARIADB_DATABASE: ${MARIADB_DATABASE:-chatbdd}
         ports:
             - "8000:8000"
-        depends_on:
-            database:
-                condition: service_healthy
+        volumes:
+            - ./go_app:/go_app
+
+
 
     adminer:
         image: adminer
         restart: always
         ports:
-            - "8080:8080"
+            - "8082:8080"
 
 

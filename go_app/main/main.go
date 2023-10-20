@@ -19,7 +19,7 @@ func main() {
 		Net:                  "tcp",
 		Addr:                 "database:3306",
 		DBName:               os.Getenv("MARIADB_DATABASE"),
-		AllowNativePasswords: true, // Il faut le préciser
+		AllowNativePasswords: true,
 	}
 
 	db, err := sql.Open("mysql", conf.FormatDSN())
