@@ -9,5 +9,5 @@ type UserItem struct {
 type TodoStoreInterface interface {
 	AddUser(item UserItem) (int, error)
 	GetUserByUsername(username string) (UserItem, error)
-	GetUsers() ([]UserItem, error)
+	//GetUsers(username string) (UserItem, error)
 }
