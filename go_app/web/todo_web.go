@@ -104,7 +104,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			})
 			// Successful login
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/profile", "token": token}
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/user-list", "token": token}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
@@ -122,5 +122,21 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 				"message": "Nom d'utilisateur et mot de passe incorrects",
 			})
 		}
+	}
+}
+
+func (h *Handler) GetUsers() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		users, err := h.Store.GetUsers()
+		if err != nil {
+			// Handle database error
+			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+				"message": "Internal Server Error",
+			})
+			return
+		}
+
+		// Respond with the users in JSON format
+		h.jsonResponse(w, http.StatusOK, users)
 	}
 }
