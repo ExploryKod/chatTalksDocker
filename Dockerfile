@@ -1,4 +1,4 @@
-FROM golang:1.18 as BUILDER
+FROM golang:1.21
 
 # Active le comportement de module indépendant
 ENV GO111MODULE=on
@@ -11,14 +11,11 @@ ENV GOARCH=$GOARCH
 
 WORKDIR /go_app
 COPY ./go_app .
+
+RUN go install github.com/cosmtrek/air@latest
+
 RUN go mod download \
     && go mod verify \
-    && go build -o /build/buildedApp main/main.go
+    && go mod tidy
 
 
-FROM scratch as FINAL
-
-WORKDIR /main
-COPY --from=BUILDER /build/buildedApp .
-
-ENTRYPOINT ["./buildedApp"]
