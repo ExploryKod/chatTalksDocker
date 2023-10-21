@@ -1,5 +1,7 @@
-package web
+package main
 
+// Hub maintains the set of active clients and broadcasts messages to the
+// clients.
 type Hub struct {
 	// Registered clients.
 	clients map[*Client]bool
@@ -14,7 +16,7 @@ type Hub struct {
 	unregister chan *Client
 }
 
-func NewHub() *Hub {
+func newHub() *Hub {
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
@@ -23,7 +25,7 @@ func NewHub() *Hub {
 	}
 }
 
-func (h *Hub) Run() {
+func (h *Hub) run() {
 	for {
 		select {
 		case client := <-h.register:
