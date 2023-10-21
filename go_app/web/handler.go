@@ -1,7 +1,7 @@
 package web
 
 import (
-	database "demoHTTP/mysql"
+	database "chatHTTP/mysql"
 	"encoding/json"
 	"net/http"
 
@@ -38,9 +38,9 @@ func NewHandler(store *database.Store) *Handler {
 
 	handler.Post("/auth/register", handler.RegisterHandler)
 	handler.Post("/auth/logged", handler.LoginHandler())
+
 	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
-		r.Post("/auth/user-list", handler.GetUsers())
 	})
 
 	return handler
