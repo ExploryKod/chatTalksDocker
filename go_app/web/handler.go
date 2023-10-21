@@ -39,7 +39,7 @@ func NewHandler(store *database.Store) *Handler {
 		chi.NewRouter(),
 		store,
 	}
-
+	
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 
 	handler.Use(middleware.Logger)
