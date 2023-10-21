@@ -1,7 +1,7 @@
 package web
 
 import (
-	database "demoHTTP/mysql"
+	database "chatHTTP/mysql"
 	"encoding/json"
 	"net/http"
 

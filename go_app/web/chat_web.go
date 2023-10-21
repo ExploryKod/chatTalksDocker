@@ -1,7 +1,7 @@
 package web
 
 import (
-	"demoHTTP"
+	"chatHTTP"
 	"net/http"
 	"time"
 
@@ -18,7 +18,7 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	userID, err := h.Store.AddUser(demoHTTP.UserItem{Username: username, Password: password})
+	userID, err := h.Store.AddUser(chatHTTP.UserItem{Username: username, Password: password})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -104,7 +104,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			})
 			// Successful login
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/user-list", "token": token}
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
@@ -125,18 +125,18 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 	}
 }
 
-func (h *Handler) GetUsers() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		users, err := h.Store.GetUsers()
-		if err != nil {
-			// Handle database error
-			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-				"message": "Internal Server Error",
-			})
-			return
-		}
-
-		// Respond with the users in JSON format
-		h.jsonResponse(w, http.StatusOK, users)
-	}
-}
+//func (h *Handler) GetUsers() http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		users, err := h.Store.GetUsers()
+//		if err != nil {
+//			// Handle database error
+//			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+//				"message": "Internal Server Error",
+//			})
+//			return
+//		}
+//
+//		// Respond with the users in JSON format
+//		h.jsonResponse(w, http.StatusOK, users)
+//	}
+//}

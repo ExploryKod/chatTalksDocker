@@ -1,16 +1,16 @@
 package database
 
 import (
+	"chatHTTP"
 	"database/sql"
-	"demoHTTP"
 )
 
 func CreateStore(db *sql.DB) *Store {
 	return &Store{
-		NewTodoStore(db),
+		NewUserStore(db),
 	}
 }
 
 type Store struct {
-	demoHTTP.TodoStoreInterface
+	chatHTTP.UserStoreInterface
 }

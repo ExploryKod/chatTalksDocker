@@ -1,4 +1,4 @@
-package demoHTTP
+package chatHTTP
 
 type UserItem struct {
 	ID       int    `json:"id"`
@@ -6,7 +6,7 @@ type UserItem struct {
 	Password string `json:"password"`
 }
 
-type TodoStoreInterface interface {
+type UserStoreInterface interface {
 	AddUser(item UserItem) (int, error)
 	GetUserByUsername(username string) (UserItem, error)
 	//GetUsers(username string) (UserItem, error)

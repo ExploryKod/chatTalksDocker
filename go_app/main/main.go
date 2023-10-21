@@ -1,9 +1,9 @@
 package main
 
 import (
+	database "chatHTTP/mysql"
+	"chatHTTP/web"
 	"database/sql"
-	database "demoHTTP/mysql"
-	"demoHTTP/web"
 	"fmt"
 	"log"
 	"net/http"
