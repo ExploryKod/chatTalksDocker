@@ -5,14 +5,23 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
 	"time"
 )
+
+type Handler struct {
+	*chi.Mux
+	*Store
+}
 
 var addr = flag.String("addr", ":8080", "http service address")
 
@@ -41,6 +50,34 @@ func serveChatPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	conf := mysql.Config{
+		User:                 "u6ncknqjamhqpa3d",
+		Passwd:               "O1Bo5YwBLl31ua5agKoq",
+		Net:                  "tcp",
+		Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
+		DBName:               "bnouoawh6epgx2ipx4hl",
+		AllowNativePasswords: true,
+	}
+
+	db, err := sql.Open("mysql", conf.FormatDSN())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	if err = db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	store := CreateStore(db)
+	//mux := NewHandler(store)
+
+	handler := &Handler{
+		chi.NewRouter(),
+		store,
+	}
+
 	flag.Parse()
 	hub := newHub()
 	go hub.run()
@@ -71,15 +108,32 @@ func main() {
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
+	r.Post("/auth/register", handler.RegisterHandler)
 
-	server := &http.Server{
-		Addr:              ":8080", // Replace with your desired address
-		ReadHeaderTimeout: 3 * time.Second,
-		Handler:           r, // Use the chi router as the handler
-	}
+	r.Post("/auth/logged", handler.LoginHandler())
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.Logger)
+		r.Use(jwtauth.Verifier(tokenAuth))
 
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+		r.Use(jwtauth.Authenticator)
+		r.Get("/chat", func(w http.ResponseWriter, r *http.Request) {
+			_, claims, _ := jwtauth.FromContext(r.Context())
+			w.Write([]byte(fmt.Sprintf("protected area. hi %v", claims["user_id"])))
+		})
+
+		r.Get("/chat", func(w http.ResponseWriter, r *http.Request) {
+
+		})
+
+		server := &http.Server{
+			Addr:              ":8000", // Replace with your desired address
+			ReadHeaderTimeout: 3 * time.Second,
+			Handler:           r, // Use the chi router as the handler
+		}
+
+		err = server.ListenAndServe()
+		if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
+	})
 }

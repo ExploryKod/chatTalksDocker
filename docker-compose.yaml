@@ -48,7 +48,7 @@ services:
         ports:
             - "8000:8000"
         volumes:
-            - ./go_app:/go_app
+            - ./gorillachat:/gorillachat
 
 
     adminer:
