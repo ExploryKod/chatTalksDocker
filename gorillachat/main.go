@@ -7,7 +7,6 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -86,8 +85,8 @@ func main() {
 	r.Use(middleware.Logger)
 
 	r.Use(cors.Handler(cors.Options{
-		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
+		//AllowedOrigins: []string{"http://localhost:8002"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"https://*", "http://*", "http://localhost:8002"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -96,6 +95,14 @@ func main() {
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+
+		r.Use(jwtauth.Authenticator)
+
+		r.Get("/chat/{id}", handler.RoomHandler())
+		//r.Get("/chat/create", handler.CreateRoomHandler())
+	})
 	// Define your routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
@@ -108,32 +115,18 @@ func main() {
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
+
 	r.Post("/auth/register", handler.RegisterHandler)
-
 	r.Post("/auth/logged", handler.LoginHandler())
-	r.Group(func(r chi.Router) {
-		r.Use(middleware.Logger)
-		r.Use(jwtauth.Verifier(tokenAuth))
 
-		r.Use(jwtauth.Authenticator)
-		r.Get("/chat", func(w http.ResponseWriter, r *http.Request) {
-			_, claims, _ := jwtauth.FromContext(r.Context())
-			w.Write([]byte(fmt.Sprintf("protected area. hi %v", claims["user_id"])))
-		})
+	server := &http.Server{
+		Addr:              ":8000", // Replace with your desired address
+		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           r, // Use the chi router as the handler
+	}
 
-		r.Get("/chat", func(w http.ResponseWriter, r *http.Request) {
-
-		})
-
-		server := &http.Server{
-			Addr:              ":8000", // Replace with your desired address
-			ReadHeaderTimeout: 3 * time.Second,
-			Handler:           r, // Use the chi router as the handler
-		}
-
-		err = server.ListenAndServe()
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-	})
+	err = server.ListenAndServe()
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }

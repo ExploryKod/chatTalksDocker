@@ -66,6 +66,17 @@ func MakeToken(name string) string {
 //	return true
 //}
 
+func (h *Handler) RoomHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		if username, ok := claims["username"].(string); ok {
+			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username})
+		} else {
+			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		}
+	}
+}
+
 func (h *Handler) LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
