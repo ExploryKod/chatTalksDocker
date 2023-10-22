@@ -1,18 +1,22 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
 	"time"
 )
+
+type Handler struct {
+	*chi.Mux
+	*Store
+}
 
 var addr = flag.String("addr", ":8080", "http service address")
 
@@ -41,6 +45,34 @@ func serveChatPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	conf := mysql.Config{
+		User:                 "u6ncknqjamhqpa3d",
+		Passwd:               "O1Bo5YwBLl31ua5agKoq",
+		Net:                  "tcp",
+		Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
+		DBName:               "bnouoawh6epgx2ipx4hl",
+		AllowNativePasswords: true,
+	}
+
+	db, err := sql.Open("mysql", conf.FormatDSN())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	if err = db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	store := CreateStore(db)
+	//mux := NewHandler(store)
+
+	handler := &Handler{
+		chi.NewRouter(),
+		store,
+	}
+
 	flag.Parse()
 	hub := newHub()
 	go hub.run()
@@ -59,6 +91,14 @@ func main() {
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+
+		r.Use(jwtauth.Authenticator)
+
+		r.Get("/chat/{id}", handler.JoinRoomHandler())
+		r.Post("/chat/create", handler.CreateRoomHandler())
+	})
 	// Define your routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
@@ -72,13 +112,16 @@ func main() {
 		serveWs(hub, w, r)
 	})
 
+	r.Post("/auth/register", handler.RegisterHandler)
+	r.Post("/auth/logged", handler.LoginHandler())
+
 	server := &http.Server{
-		Addr:              ":8080", // Replace with your desired address
+		Addr:              ":8000", // Replace with your desired address
 		ReadHeaderTimeout: 3 * time.Second,
 		Handler:           r, // Use the chi router as the handler
 	}
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

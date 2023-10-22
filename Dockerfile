@@ -9,8 +9,8 @@ ENV CGO_ENABLED=0
 ENV GOOS=$GOOS
 ENV GOARCH=$GOARCH
 
-WORKDIR /go_app
-COPY ./go_app .
+WORKDIR /gorillachat
+COPY ./gorillachat .
 
 #RUN go install github.com/cosmtrek/air@latest
 #RUN apt-get update

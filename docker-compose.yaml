@@ -29,7 +29,7 @@ services:
         ports:
             - "8001:8001"
         volumes:
-            - ./go_app:/go_app
+            - ./gorillachat:/gorillachat
 
 
     adminer:

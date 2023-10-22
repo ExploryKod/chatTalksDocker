@@ -35,7 +35,7 @@ func main() {
 	store := database.CreateStore(db)
 	mux := web.NewHandler(store)
 
-	err = http.ListenAndServe(":8000", mux)
+	err = http.ListenAndServe(":8009", mux)
 	if err != nil {
 		_ = fmt.Errorf("impossible de lancer le serveur : %w", err)
 		return
