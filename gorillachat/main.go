@@ -1,7 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -73,10 +69,10 @@ func main() {
 	store := CreateStore(db)
 	//mux := NewHandler(store)
 
-	handler := &Handler{
-		chi.NewRouter(),
-		store,
-	}
+	//handler := &Handler{
+	//	chi.NewRouter(),
+	//	store,
+	//}
 
 	flag.Parse()
 	hub := newHub()
