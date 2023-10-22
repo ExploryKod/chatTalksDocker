@@ -2,6 +2,7 @@ package web
 
 import (
 	"chatHTTP"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
@@ -153,6 +154,6 @@ func (h *Handler) DeleteUser() http.HandlerFunc {
 			return
 		}
 
-		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Utilisateur n° ${id} supprimé"})
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": fmt.Sprintf("Utilisateur n° %d supprimé", id)})
 	}
 }
