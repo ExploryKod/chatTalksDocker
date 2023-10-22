@@ -10,4 +10,5 @@ type UserStoreInterface interface {
 	AddUser(item UserItem) (int, error)
 	GetUserByUsername(username string) (UserItem, error)
 	GetUsers() ([]UserItem, error)
+	DeleteUser(id int) error
 }

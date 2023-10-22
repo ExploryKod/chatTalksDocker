@@ -51,13 +51,13 @@ func NewHandler(store *database.Store) *Handler {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true, // initialement en false
+		AllowCredentials: true, // initialement en false mais nécessaire à true pour les httpOnly cookie dans les credentials include des requête du front
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
 	handler.Post("/auth/register", handler.RegisterHandler)
 	handler.Post("/auth/logged", handler.LoginHandler())
-	handler.Get("/user-list", handler.GetUsers())
+
 	// Il faut encore déplacer les fonction qui sont dans pakage main actuellement dans des handler
 
 	//handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +66,9 @@ func NewHandler(store *database.Store) *Handler {
 
 	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
+		//r.Use(authMiddleware)
+		r.Get("/user-list", handler.GetUsers())
+		r.Get("/delete-user", handler.DeleteUser())
 	})
 
 	return handler
@@ -75,6 +78,7 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Failed to upgrade connection to WebSocket", http.StatusInternalServerError)
 		return
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}

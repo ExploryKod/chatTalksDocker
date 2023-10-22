@@ -70,3 +70,12 @@ func (t *UserStore) AddUser(item chatHTTP.UserItem) (int, error) {
 
 	return int(id), nil
 }
+
+func (t *UserStore) DeleteUser(id int) error {
+	_, err := t.DB.Exec("DELETE FROM Users WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
