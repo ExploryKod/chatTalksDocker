@@ -27,7 +27,7 @@ services:
             MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
             MARIADB_DATABASE: ${MARIADB_DATABASE:-chatbdd}
         ports:
-            - "8001:8001"
+            - "8000:8000"
         volumes:
             - ./gorillachat:/gorillachat
 

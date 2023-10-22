@@ -20,4 +20,5 @@ RUN go mod download \
     && go mod verify \
     && go mod tidy
 
+CMD ["go", "run", "."]
 
