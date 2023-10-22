@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/go-chi/chi/v5"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -65,17 +67,6 @@ func MakeToken(name string) string {
 //	// Return true if the credentials are valid, otherwise false.
 //	return true
 //}
-
-func (h *Handler) RoomHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		_, claims, _ := jwtauth.FromContext(r.Context())
-		if username, ok := claims["username"].(string); ok {
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username})
-		} else {
-			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
-		}
-	}
-}
 
 func (h *Handler) LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -150,3 +141,77 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 //		h.jsonResponse(w, http.StatusOK, users)
 //	}
 //}
+
+func (h *Handler) CreateRoomHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		if username, ok := claims["username"].(string); ok {
+			user, err := h.Store.GetUserByUsername(username)
+			if err != nil {
+				// Handle database error
+				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+					"message": "Internal Server Error",
+				})
+				return
+			}
+			roomName := r.FormValue("roomName")
+			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "room de " + user.Username})
+			if err != nil {
+				// Handle database error
+				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+					"message": "Internal Server Error",
+				})
+				return
+			}
+
+			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username, "roomID": roomId})
+		} else {
+			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		}
+	}
+}
+
+func (h *Handler) JoinRoomHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		roomID := chi.URLParam(r, "id")
+		var id, err = strconv.Atoi(roomID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		room, err := h.Store.GetRoomById(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		if username, ok := claims["username"].(string); ok {
+			user, err := h.Store.GetUserByUsername(username)
+			if err != nil {
+				// Handle database error
+				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+					"message": "Internal Server Error",
+				})
+				return
+			}
+			fromRoom, err := h.GetOneUserFromRoom(room.ID, user.ID)
+			if err != nil {
+				h.jsonResponse(w, http.StatusOK, map[string]interface{}{
+					"message": "fromRoom est null",
+				})
+			}
+			if fromRoom.Username != "" {
+				h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome back in your room " + username})
+				return
+			}
+			err = h.Store.AddUserToRoom(room.ID, user.ID)
+			if err != nil {
+				return
+			}
+			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome in your new room " + username})
+		} else {
+			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		}
+	}
+}
