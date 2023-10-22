@@ -2,7 +2,9 @@ package web
 
 import (
 	"chatHTTP"
+	"github.com/go-chi/chi/v5"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -137,5 +139,20 @@ func (h *Handler) GetUsers() http.HandlerFunc {
 		}
 
 		h.jsonResponse(w, http.StatusOK, users)
+	}
+}
+
+func (h *Handler) DeleteUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		QueryId := chi.URLParam(r, "id")
+		id, _ := strconv.Atoi(QueryId)
+
+		err := h.Store.DeleteUser(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Utilisateur n° ${id} supprimé"})
 	}
 }

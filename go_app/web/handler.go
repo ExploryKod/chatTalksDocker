@@ -58,6 +58,7 @@ func NewHandler(store *database.Store) *Handler {
 	handler.Post("/auth/register", handler.RegisterHandler)
 	handler.Post("/auth/logged", handler.LoginHandler())
 	handler.Get("/user-list", handler.GetUsers())
+	handler.Get("/delete-user/{id}", handler.DeleteUser())
 	// Il faut encore déplacer les fonction qui sont dans pakage main actuellement dans des handler
 
 	//handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
