@@ -39,8 +39,8 @@ func NewHandler(store *database.Store) *Handler {
 		chi.NewRouter(),
 		store,
 	}
-	
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+
+	//client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 
 	handler.Use(middleware.Logger)
 
@@ -57,11 +57,12 @@ func NewHandler(store *database.Store) *Handler {
 
 	handler.Post("/auth/register", handler.RegisterHandler)
 	handler.Post("/auth/logged", handler.LoginHandler())
+	handler.Get("/user-list", handler.GetUsers())
 	// Il faut encore déplacer les fonction qui sont dans pakage main actuellement dans des handler
 
-	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ServeWs(client.hub, w, r)
-	})
+	//handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
+	//	ServeWs(client.hub, w, r)
+	//})
 
 	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
