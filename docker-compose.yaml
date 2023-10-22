@@ -50,6 +50,7 @@ services:
         volumes:
             - ./go_app:/go_app
 
+
     adminer:
         image: adminer
         restart: always

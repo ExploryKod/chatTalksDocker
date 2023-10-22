@@ -3,11 +3,12 @@ package web
 import (
 	database "chatHTTP/mysql"
 	"encoding/json"
+	"log"
 	"net/http"
 
-	"github.com/go-chi/jwtauth/v5"
-
 	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/gorilla/websocket"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,11 +18,29 @@ import (
 
 // const Secret = "42a00d84-9914-4a77-b6bd-d2a9d09c6795"
 
+type Handler struct {
+	*chi.Mux
+	*database.Store
+}
+
+// Client is a middleman between the websocket connection and the hub.
+type Client struct {
+	hub *Hub
+
+	// The websocket connection.
+	conn *websocket.Conn
+
+	// Buffered channel of outbound messages.
+	send chan []byte
+}
+
 func NewHandler(store *database.Store) *Handler {
 	handler := &Handler{
 		chi.NewRouter(),
 		store,
 	}
+
+	//client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 
 	handler.Use(middleware.Logger)
 
@@ -38,6 +57,12 @@ func NewHandler(store *database.Store) *Handler {
 
 	handler.Post("/auth/register", handler.RegisterHandler)
 	handler.Post("/auth/logged", handler.LoginHandler())
+	handler.Get("/user-list", handler.GetUsers())
+	// Il faut encore déplacer les fonction qui sont dans pakage main actuellement dans des handler
+
+	//handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
+	//	ServeWs(client.hub, w, r)
+	//})
 
 	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
@@ -46,9 +71,19 @@ func NewHandler(store *database.Store) *Handler {
 	return handler
 }
 
-type Handler struct {
-	*chi.Mux
-	*database.Store
+func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client.hub.register <- client
+
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go client.writePump()
+	go client.readPump()
 }
 
 func (h *Handler) jsonResponse(w http.ResponseWriter, status int, data interface{}) {
