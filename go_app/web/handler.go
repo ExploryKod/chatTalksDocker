@@ -51,7 +51,7 @@ func NewHandler(store *database.Store) *Handler {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true, // initialement en false
+		AllowCredentials: true, // initialement en false mais nécessaire à true pour les httpOnly cookie dans les credentials include des requête du front
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
@@ -76,6 +76,7 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Failed to upgrade connection to WebSocket", http.StatusInternalServerError)
 		return
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
