@@ -136,7 +136,6 @@ func (h *Handler) GetUsers() http.HandlerFunc {
 			return
 		}
 
-		// Respond with the users in JSON format
 		h.jsonResponse(w, http.StatusOK, users)
 	}
 }
