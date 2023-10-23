@@ -24,7 +24,7 @@ type Hub struct {
 
 	unregister chan *Client
 
-	broadcast chan []byte
+	broadcast chan *Message
 }
 
 func newHub(name string, private bool) *Hub {
@@ -35,7 +35,7 @@ func newHub(name string, private bool) *Hub {
 		clients:    make(map[*Client]bool),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		broadcast:  make(chan []byte),
+		broadcast:  make(chan *Message),
 	}
 }
 
@@ -50,7 +50,7 @@ func (h *Hub) runHub() {
 			h.unregisterClientInHub(client)
 
 		case message := <-h.broadcast:
-			h.broadcastToClientsInHub(message)
+			h.broadcastToClientsInHub(message.encode())
 		}
 	}
 }
