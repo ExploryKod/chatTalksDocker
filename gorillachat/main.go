@@ -98,6 +98,7 @@ func main() {
 		r.Use(jwtauth.Authenticator)
 		// use JoinHub method to join a hub
 		r.Get("/chat/{id}", handler.JoinRoomHandler())
+		r.Get("/chat/rooms", handler.GetRooms())
 		r.Post("/chat/create", handler.CreateRoomHandler())
 	})
 	// Define your routes

@@ -16,11 +16,12 @@ type RoomItem struct {
 type UserStoreInterface interface {
 	AddUser(item UserItem) (int, error)
 	GetUserByUsername(username string) (UserItem, error)
-	// GetUsers(username string) (UserItem, error)
+	// GetUsers() (UserItem, error)
 	AddRoom(item RoomItem) (int, error)
 	GetRoomByName(name string) (RoomItem, error)
 	GetRoomById(id int) (RoomItem, error)
 	AddUserToRoom(roomID int, userID int) error
 	GetUsersFromRoom(roomID int) ([]UserItem, error)
 	GetOneUserFromRoom(roomID int, userID int) (UserItem, error)
+	GetRooms() ([]RoomItem, error)
 }

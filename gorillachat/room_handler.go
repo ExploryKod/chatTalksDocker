@@ -96,3 +96,18 @@ func (h *Handler) JoinRoomHandler() http.HandlerFunc {
 		}
 	}
 }
+
+func (h *Handler) GetRooms() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rooms, err := h.Store.GetRooms()
+		if err != nil {
+			// Handle database error
+			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+				"message": "Internal Server Error",
+			})
+			return
+		}
+
+		h.jsonResponse(w, http.StatusOK, rooms)
+	}
+}
