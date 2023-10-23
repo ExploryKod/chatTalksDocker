@@ -197,9 +197,10 @@ func (h *Handler) JoinRoomHandler() http.HandlerFunc {
 			}
 			fromRoom, err := h.GetOneUserFromRoom(room.ID, user.ID)
 			if err != nil {
-				h.jsonResponse(w, http.StatusOK, map[string]interface{}{
-					"message": "fromRoom est null",
+				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+					"message": "Internal Server Error DB",
 				})
+				return
 			}
 			if fromRoom.Username != "" {
 				h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome back in your room " + username})

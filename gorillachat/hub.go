@@ -4,50 +4,98 @@
 
 package main
 
+import (
+	"fmt"
+	"github.com/google/uuid"
+)
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
-	// Registered clients.
+	ID uuid.UUID `json:"id"`
+
+	Name string `json:"name"`
+
+	Private bool `json:"private"`
+
 	clients map[*Client]bool
 
-	// Inbound messages from the clients.
-	broadcast chan []byte
-
-	// Register requests from the clients.
 	register chan *Client
 
-	// Unregister requests from clients.
 	unregister chan *Client
+
+	broadcast chan []byte
 }
 
-func newHub() *Hub {
+func newHub(name string, private bool) *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
+		ID:         uuid.New(),
+		Name:       name,
+		Private:    private,
+		clients:    make(map[*Client]bool),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		broadcast:  make(chan []byte),
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) runHub() {
 	for {
 		select {
+
 		case client := <-h.register:
-			h.clients[client] = true
+			h.registerClientInHub(client)
+
 		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				close(client.send)
-			}
+			h.unregisterClientInHub(client)
+
 		case message := <-h.broadcast:
-			for client := range h.clients {
-				select {
-				case client.send <- message:
-				default:
-					close(client.send)
-					delete(h.clients, client)
-				}
-			}
+			h.broadcastToClientsInHub(message)
 		}
 	}
+}
+
+func (h *Hub) registerClientInHub(client *Client) {
+	if !h.Private {
+		h.notifyClientJoined(client)
+	}
+	h.clients[client] = true
+}
+
+func (h *Hub) unregisterClientInHub(client *Client) {
+	if _, ok := h.clients[client]; ok {
+		delete(h.clients, client)
+	}
+}
+
+func (h *Hub) broadcastToClientsInHub(message []byte) {
+	for client := range h.clients {
+		client.send <- message
+	}
+}
+
+func (h *Hub) GetId() string {
+	return h.ID.String()
+}
+
+func (h *Hub) GetName() string {
+	return h.Name
+}
+
+const welcomeMessage = "%s joined the room"
+
+func (h *Hub) notifyClientJoined(client *Client) {
+	message := &Message{
+		Action:  SendMessageAction,
+		Target:  h,
+		Message: fmt.Sprintf(welcomeMessage, client.GetName()),
+	}
+
+	h.broadcastToClientsInHub(message.encode())
+}
+
+func (h *Hub) Hub(client *Client) {
+	// by sending the message first the new user won't see his own message.
+	h.notifyClientJoined(client)
+	h.clients[client] = true
 }

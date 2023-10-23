@@ -74,8 +74,8 @@ func main() {
 	}
 
 	flag.Parse()
-	hub := newHub()
-	go hub.run()
+	wsServer := NewWebsocketServer()
+	go wsServer.Run()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -109,7 +109,7 @@ func main() {
 	r.Get("/mychat", serveChatPage)
 
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r)
+		serveWs(wsServer, w, r)
 	})
 
 	r.Post("/auth/register", handler.RegisterHandler)
