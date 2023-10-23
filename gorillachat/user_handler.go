@@ -78,7 +78,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 		if err != nil {
 			// Handle database error
 			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-				"message": "Internal Server Error",
+				"message": "Internal Server Error" + err.Error(),
 			})
 			return
 		}
