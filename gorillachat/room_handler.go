@@ -86,7 +86,6 @@ func (h *Handler) JoinRoomHandler() http.HandlerFunc {
 				h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome back in your room " + username})
 				return
 			}
-			client := newClient(, , )
 			err = h.Store.AddUserToRoom(room.ID, user.ID)
 			if err != nil {
 				return
