@@ -124,21 +124,20 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 	}
 }
 
-//func (h *Handler) GetUsers() http.HandlerFunc {
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		users, err := h.Store.GetUsers()
-//		if err != nil {
-//			// Handle database error
-//			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-//				"message": "Internal Server Error",
-//			})
-//			return
-//		}
-//
-//		// Respond with the users in JSON format
-//		h.jsonResponse(w, http.StatusOK, users)
-//	}
-//}
+func (h *Handler) GetUsers() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		users, err := h.Store.GetUsers()
+		if err != nil {
+			// Handle database error
+			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+				"message": "Internal Server Error",
+			})
+			return
+		}
+
+		h.jsonResponse(w, http.StatusOK, users)
+	}
+}
 
 func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

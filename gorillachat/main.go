@@ -99,6 +99,7 @@ func main() {
 		r.Get("/chat/{id}", handler.JoinRoomHandler())
 		r.Get("/chat/rooms", handler.GetRooms())
 		r.Post("/chat/create", handler.CreateRoomHandler())
+		r.Get("/user-list", handler.GetUsers())
 	})
 	// Define your routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
