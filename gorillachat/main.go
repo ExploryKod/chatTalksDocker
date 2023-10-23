@@ -10,6 +10,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -45,6 +46,11 @@ func serveChatPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000" // Default to port 8000 if PORT environment variable is not set
+	}
+
 	conf := mysql.Config{
 		User:                 "u6ncknqjamhqpa3d",
 		Passwd:               "O1Bo5YwBLl31ua5agKoq",
@@ -116,7 +122,7 @@ func main() {
 	r.Post("/auth/logged", handler.LoginHandler())
 
 	server := &http.Server{
-		Addr:              ":8000", // Replace with your desired address
+		Addr:              port, // Replace with your desired address
 		ReadHeaderTimeout: 3 * time.Second,
 		Handler:           r, // Use the chi router as the handler
 	}
