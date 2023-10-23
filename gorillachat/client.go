@@ -198,8 +198,9 @@ func (client *Client) handleNewMessage(jsonMessage []byte) {
 	switch message.Action {
 	case SendMessageAction:
 		hubID := message.Target.GetId()
+		// console.log the hubID
 		if hub := client.wsServer.findHubByID(hubID); hub != nil {
-			hub.broadcast <- message.encode()
+			hub.broadcast <- &message
 		}
 		// We delegate the join and leave actions.
 	case JoinHubAction:
