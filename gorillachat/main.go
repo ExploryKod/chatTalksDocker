@@ -97,6 +97,7 @@ func main() {
 		r.Use(jwtauth.Authenticator)
 
 		r.Get("/chat/{id}", handler.JoinRoomHandler())
+		r.Get("/chat/rooms", handler.GetRooms())
 		r.Post("/chat/create", handler.CreateRoomHandler())
 	})
 	// Define your routes

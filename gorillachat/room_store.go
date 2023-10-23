@@ -1,6 +1,8 @@
 package main
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 func (t *UserStore) AddRoom(item RoomItem) (int, error) {
 	res, err := t.DB.Exec("INSERT INTO Rooms (name, description) VALUES (?, ?)", item.Name, item.Description)
@@ -98,4 +100,29 @@ func (t *UserStore) GetOneUserFromRoom(roomID int, userID int) (UserItem, error)
 	}
 
 	return user, nil
+}
+
+func (t *UserStore) GetRooms() ([]RoomItem, error) {
+	var rooms []RoomItem
+
+	rows, err := t.Query("SELECT id, name, description FROM Rooms")
+	if err != nil {
+		return []RoomItem{}, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var room RoomItem
+		if err = rows.Scan(&room.ID, &room.Name, &room.Description); err != nil {
+			return []RoomItem{}, err
+		}
+		rooms = append(rooms, room)
+	}
+
+	if err = rows.Err(); err != nil {
+		return []RoomItem{}, err
+	}
+
+	return rooms, nil
 }

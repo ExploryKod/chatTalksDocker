@@ -1,5 +1,7 @@
 package main
 
+import "net/http"
+
 //func (h *Handler) CreateRoomHandler(w http.ResponseWriter, r *http.Request) {
 //	// Extract registration data
 //	name := r.FormValue("name")
@@ -42,3 +44,18 @@ package main
 //	// Respond with a success message
 //	h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Room found", "room": room})
 //}
+
+func (h *Handler) GetRooms() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rooms, err := h.Store.GetRooms()
+		if err != nil {
+			// Handle database error
+			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+				"message": "Internal Server Error",
+			})
+			return
+		}
+
+		h.jsonResponse(w, http.StatusOK, rooms)
+	}
+}
