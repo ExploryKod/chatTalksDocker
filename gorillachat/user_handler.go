@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"net/http"
 	"time"
 
@@ -103,12 +102,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 				Value: token,
 			})
 			// Successful login
-			client = newClient(
-				upgrader.Upgrade(w, r, nil),
-				NewWebsocketServer(),
-				username,
-			)
-				})
+
 			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
