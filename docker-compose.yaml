@@ -40,6 +40,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+        container_name: go-api
         restart: always
         tty: true
         environment:
