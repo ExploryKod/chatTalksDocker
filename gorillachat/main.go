@@ -1,5 +1,6 @@
 package main
 
+import "C"
 import (
 	"database/sql"
 	"flag"
@@ -95,7 +96,7 @@ func main() {
 		r.Use(jwtauth.Verifier(tokenAuth))
 
 		r.Use(jwtauth.Authenticator)
-
+		// use JoinHub method to join a hub
 		r.Get("/chat/{id}", handler.JoinRoomHandler())
 		r.Post("/chat/create", handler.CreateRoomHandler())
 	})
