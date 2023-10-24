@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -103,7 +104,16 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			})
 			// Successful login
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token}
+			// Convert role (admin column) to string
+			var roleStr string
+
+			if user.Admin != nil {
+				roleStr = strconv.Itoa(*user.Admin)
+			} else {
+				roleStr = "0"
+			}
+
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "role": roleStr}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login

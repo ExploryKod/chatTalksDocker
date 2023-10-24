@@ -199,6 +199,7 @@ func (client *Client) handleNewMessage(jsonMessage []byte) {
 	case SendMessageAction:
 		hubID := message.Target.GetId()
 		// console.log the hubID
+		println(hubID)
 		if hub := client.wsServer.findHubByID(hubID); hub != nil {
 			hub.broadcast <- &message
 		}
