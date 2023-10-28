@@ -91,6 +91,10 @@ func main() {
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
+	r.Post("/auth/register", handler.RegisterHandler)
+	r.Post("/auth/logged", handler.LoginHandler())
+	r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
+
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 
@@ -106,16 +110,9 @@ func main() {
 		w.Write([]byte("Hello World!"))
 	})
 
-	r.Get("/home", serveHome)
-
-	r.Get("/mychat", serveChatPage)
-
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(wsServer, w, r)
 	})
-
-	r.Post("/auth/register", handler.RegisterHandler)
-	r.Post("/auth/logged", handler.LoginHandler())
 
 	server := &http.Server{
 		Addr:              ":8000", // Replace with your desired address

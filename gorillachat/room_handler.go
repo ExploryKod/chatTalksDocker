@@ -111,3 +111,32 @@ func (h *Handler) GetRooms() http.HandlerFunc {
 		h.jsonResponse(w, http.StatusOK, rooms)
 	}
 }
+
+func (h *Handler) CreateRoomHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		if username, ok := claims["username"].(string); ok {
+			user, err := h.Store.GetUserByUsername(username)
+			if err != nil {
+				// Handle database error
+				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+					"message": "Internal Server Error",
+				})
+				return
+			}
+			roomName := r.FormValue("roomName")
+			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "room de " + user.Username})
+			if err != nil {
+				// Handle database error
+				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+					"message": "Internal Server Error",
+				})
+				return
+			}
+
+			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username, "roomID": roomId})
+		} else {
+			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		}
+	}
+}

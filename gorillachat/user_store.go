@@ -69,3 +69,12 @@ func (t *UserStore) AddUser(item UserItem) (int, error) {
 
 	return int(id), nil
 }
+
+func (t *UserStore) DeleteUserById(id int) error {
+	_, err := t.DB.Exec("DELETE FROM Users WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -1,17 +1,13 @@
 package main
 
 import (
+	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
 )
-
-type TemplateData struct {
-	Titre   string
-	Content any
-}
 
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
@@ -149,31 +145,18 @@ func (h *Handler) GetUsers() http.HandlerFunc {
 	}
 }
 
-func (h *Handler) CreateRoomHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		_, claims, _ := jwtauth.FromContext(r.Context())
-		if username, ok := claims["username"].(string); ok {
-			user, err := h.Store.GetUserByUsername(username)
-			if err != nil {
-				// Handle database error
-				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-					"message": "Internal Server Error",
-				})
-				return
-			}
-			roomName := r.FormValue("roomName")
-			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "room de " + user.Username})
-			if err != nil {
-				// Handle database error
-				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-					"message": "Internal Server Error",
-				})
-				return
-			}
+func (h *Handler) DeleteUserHandler() http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		QueryId := chi.URLParam(request, "id")
+		//QueryId := request.FormValue("id")
+		id, _ := strconv.Atoi(QueryId)
 
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username, "roomID": roomId})
-		} else {
-			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		err := h.Store.DeleteUserById(id)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			return
 		}
+		h.jsonResponse(writer, http.StatusOK, map[string]interface{}{"message": "User deleted"})
+
 	}
 }
