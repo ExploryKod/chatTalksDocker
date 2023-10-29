@@ -26,4 +26,5 @@ type UserStoreInterface interface {
 	GetOneUserFromRoom(roomID int, userID int) (UserItem, error)
 	GetRooms() ([]RoomItem, error)
 	DeleteUserById(id int) error
+	UpdateUser(item UserItem) error
 }

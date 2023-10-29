@@ -13,15 +13,19 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-
-	userID, err := h.Store.AddUser(UserItem{Username: username, Password: password})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	existentUser, _ := h.Store.GetUserByUsername(username)
+	if existentUser.Username != "" {
+		http.Error(w, "User already exists", http.StatusBadRequest)
 		return
+	} else {
+		userID, err := h.Store.AddUser(UserItem{Username: username, Password: password})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Respond with a success message
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Registration successful", "userID": userID})
 	}
-
-	// Respond with a success message
-	h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Registration successful", "userID": userID})
 }
 
 var tokenAuth *jwtauth.JWTAuth
@@ -145,6 +149,29 @@ func (h *Handler) GetUsers() http.HandlerFunc {
 	}
 }
 
+func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Extract registration data
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	userID := r.FormValue("id")
+	id, _ := strconv.Atoi(userID)
+	existentUser, _ := h.Store.GetUserByUsername(username)
+	if existentUser.Username != "" {
+
+		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Password: password})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Respond with a success message
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Update successful"})
+	} else {
+		http.Error(w, "No user with this id found", http.StatusBadRequest)
+		return
+	}
+}
+
 func (h *Handler) DeleteUserHandler() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		QueryId := chi.URLParam(request, "id")
@@ -157,6 +184,7 @@ func (h *Handler) DeleteUserHandler() http.HandlerFunc {
 			return
 		}
 		h.jsonResponse(writer, http.StatusOK, map[string]interface{}{"message": "User deleted"})
+		http.Redirect(writer, request, "/user-list", http.StatusSeeOther)
 
 	}
 }

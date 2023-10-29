@@ -70,6 +70,17 @@ func (t *UserStore) AddUser(item UserItem) (int, error) {
 	return int(id), nil
 }
 
+func (t *UserStore) UpdateUser(item UserItem) error {
+
+	_, err := t.DB.Exec("UPDATE Users SET username = ?, password = ?, admin = ? WHERE id = ?", item.Username, item.Password, item.Admin, item.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
 func (t *UserStore) DeleteUserById(id int) error {
 	_, err := t.DB.Exec("DELETE FROM Users WHERE id = ?", id)
 	if err != nil {

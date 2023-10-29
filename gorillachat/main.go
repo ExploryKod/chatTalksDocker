@@ -10,6 +10,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -45,12 +46,21 @@ func serveChatPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	//conf := mysql.Config{
+	//	User:                 "u6ncknqjamhqpa3d",
+	//	Passwd:               "O1Bo5YwBLl31ua5agKoq",
+	//	Net:                  "tcp",
+	//	Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
+	//	DBName:               "bnouoawh6epgx2ipx4hl",
+	//	AllowNativePasswords: true,
+	//}
+
 	conf := mysql.Config{
-		User:                 "u6ncknqjamhqpa3d",
-		Passwd:               "O1Bo5YwBLl31ua5agKoq",
+		User:                 "root",
+		Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
 		Net:                  "tcp",
-		Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
-		DBName:               "bnouoawh6epgx2ipx4hl",
+		Addr:                 "database:3306",
+		DBName:               os.Getenv("MARIADB_DATABASE"),
 		AllowNativePasswords: true,
 	}
 
@@ -93,7 +103,6 @@ func main() {
 
 	r.Post("/auth/register", handler.RegisterHandler)
 	r.Post("/auth/logged", handler.LoginHandler())
-	r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
 
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
@@ -104,11 +113,10 @@ func main() {
 		r.Get("/chat/rooms", handler.GetRooms())
 		r.Post("/chat/create", handler.CreateRoomHandler())
 		r.Get("/user-list", handler.GetUsers())
+		r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
+		r.Get("/update-user", handler.UpdateHandler)
 	})
 	// Define your routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
-	})
 
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(wsServer, w, r)
