@@ -94,8 +94,9 @@ func (server *WsServer) notifyClientLeft(client *Client) {
 func (server *WsServer) listOnlineClients(client *Client) {
 	for existingClient := range server.clients {
 		message := &Message{
-			Action: UserJoinedAction,
-			Sender: existingClient,
+			Action:  UserJoinedAction,
+			Sender:  existingClient,
+			Message: " you joined the room",
 		}
 		client.send <- message.encode()
 	}

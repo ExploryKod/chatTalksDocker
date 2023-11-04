@@ -294,7 +294,7 @@ func (client *Client) notifyRoomJoined(hub *Hub, sender *Client) {
 		Action:  HubJoinedAction,
 		Target:  hub,
 		Sender:  sender,
-		Message: "joined the room BRO",
+		Message: "joined the room",
 	}
 
 	client.send <- message.encode()
