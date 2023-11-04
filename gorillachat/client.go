@@ -197,13 +197,16 @@ func (client *Client) handleNewMessage(jsonMessage []byte) {
 
 	switch message.Action {
 	case SendMessageAction:
-		hubID := message.Target.GetId()
-		// console.log the hubID
-		println(hubID)
-		if hub := client.wsServer.findHubByID(hubID); hub != nil {
+		hubName := message.Target.GetName()
+		println("hubName: ", hubName)
+		//if hub := client.wsServer.findHubByID(hubID); hub != nil {
+		//	println("hub found")
+		//	hub.broadcast <- &message
+		//}
+		if hub := client.wsServer.findHubByName(hubName); hub != nil {
+			println("hub found")
 			hub.broadcast <- &message
 		}
-		// We delegate the join and leave actions.
 	case JoinHubAction:
 		client.handleJoinHubMessage(message)
 
@@ -288,9 +291,10 @@ func (client *Client) isInRoom(hub *Hub) bool {
 // Notify the client of the new room he/she joined
 func (client *Client) notifyRoomJoined(hub *Hub, sender *Client) {
 	message := Message{
-		Action: HubJoinedAction,
-		Target: hub,
-		Sender: sender,
+		Action:  HubJoinedAction,
+		Target:  hub,
+		Sender:  sender,
+		Message: "joined the room BRO",
 	}
 
 	client.send <- message.encode()
