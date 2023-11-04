@@ -125,7 +125,7 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 				return
 			}
 			roomName := r.FormValue("roomName")
-			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "room de " + user.Username})
+			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "coquelicots"})
 			if err != nil {
 				// Handle database error
 				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
