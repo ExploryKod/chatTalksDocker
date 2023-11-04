@@ -9,24 +9,23 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 )
 
-type TemplateData struct {
-	Titre   string
-	Content any
-}
-
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-
-	userID, err := h.Store.AddUser(UserItem{Username: username, Password: password})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	existentUser, _ := h.Store.GetUserByUsername(username)
+	if existentUser.Username != "" {
+		http.Error(w, "User already exists", http.StatusBadRequest)
 		return
+	} else {
+		userID, err := h.Store.AddUser(UserItem{Username: username, Password: password})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Respond with a success message
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Registration successful", "userID": userID})
 	}
-
-	// Respond with a success message
-	h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Registration successful", "userID": userID})
 }
 
 var tokenAuth *jwtauth.JWTAuth
@@ -80,7 +79,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 		if err != nil {
 			// Handle database error
 			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-				"message": "Internal Server Error",
+				"message": "Internal Server Error" + err.Error(),
 			})
 			return
 		}
@@ -105,7 +104,16 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			})
 			// Successful login
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token}
+			// Convert role (admin column) to string
+			var roleStr string
+
+			if user.Admin != nil {
+				roleStr = strconv.Itoa(*user.Admin)
+			} else {
+				roleStr = "0"
+			}
+
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "role": roleStr}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
@@ -126,92 +134,57 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 	}
 }
 
-//func (h *Handler) GetUsers() http.HandlerFunc {
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		users, err := h.Store.GetUsers()
-//		if err != nil {
-//			// Handle database error
-//			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-//				"message": "Internal Server Error",
-//			})
-//			return
-//		}
-//
-//		// Respond with the users in JSON format
-//		h.jsonResponse(w, http.StatusOK, users)
-//	}
-//}
-
-func (h *Handler) CreateRoomHandler() http.HandlerFunc {
+func (h *Handler) GetUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, claims, _ := jwtauth.FromContext(r.Context())
-		if username, ok := claims["username"].(string); ok {
-			user, err := h.Store.GetUserByUsername(username)
-			if err != nil {
-				// Handle database error
-				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-					"message": "Internal Server Error",
-				})
-				return
-			}
-			roomName := r.FormValue("roomName")
-			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "room de " + user.Username})
-			if err != nil {
-				// Handle database error
-				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-					"message": "Internal Server Error",
-				})
-				return
-			}
-
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username, "roomID": roomId})
-		} else {
-			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		users, err := h.Store.GetUsers()
+		if err != nil {
+			// Handle database error
+			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
+				"message": "Internal Server Error",
+			})
+			return
 		}
+
+		h.jsonResponse(w, http.StatusOK, users)
 	}
 }
 
-func (h *Handler) JoinRoomHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		roomID := chi.URLParam(r, "id")
-		var id, err = strconv.Atoi(roomID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
-		room, err := h.Store.GetRoomById(id)
+	// Extract registration data
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	userID := r.FormValue("id")
+	id, _ := strconv.Atoi(userID)
+	existentUser, _ := h.Store.GetUserByUsername(username)
+	if existentUser.Username != "" {
+
+		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Password: password})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		_, claims, _ := jwtauth.FromContext(r.Context())
-		if username, ok := claims["username"].(string); ok {
-			user, err := h.Store.GetUserByUsername(username)
-			if err != nil {
-				// Handle database error
-				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
-					"message": "Internal Server Error",
-				})
-				return
-			}
-			fromRoom, err := h.GetOneUserFromRoom(room.ID, user.ID)
-			if err != nil {
-				h.jsonResponse(w, http.StatusOK, map[string]interface{}{
-					"message": "fromRoom est null",
-				})
-			}
-			if fromRoom.Username != "" {
-				h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome back in your room " + username})
-				return
-			}
-			err = h.Store.AddUserToRoom(room.ID, user.ID)
-			if err != nil {
-				return
-			}
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome in your new room " + username})
-		} else {
-			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
+		// Respond with a success message
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Update successful"})
+	} else {
+		http.Error(w, "No user with this id found", http.StatusBadRequest)
+		return
+	}
+}
+
+func (h *Handler) DeleteUserHandler() http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		QueryId := chi.URLParam(request, "id")
+		//QueryId := request.FormValue("id")
+		id, _ := strconv.Atoi(QueryId)
+
+		err := h.Store.DeleteUserById(id)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			return
 		}
+		h.jsonResponse(writer, http.StatusOK, map[string]interface{}{"message": "User deleted"})
+		http.Redirect(writer, request, "/user-list", http.StatusSeeOther)
+
 	}
 }

@@ -7,7 +7,7 @@ services:
         ports:
             - "3308:3306"
         volumes:
-            - ./migrations/01-create-table.up.sql:/docker-entrypoint-initdb.d/migration.sql
+            - ./migrations/chatbdd.sql:/docker-entrypoint-initdb.d/migration.sql
         environment:
             MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
             MARIADB_DATABASE: ${MARIADB_DATABASE:-chatbdd}
@@ -21,6 +21,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+        container_name: go-api
         restart: always
         tty: true
         environment:

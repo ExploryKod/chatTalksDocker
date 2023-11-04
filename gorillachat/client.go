@@ -5,7 +5,8 @@
 package main
 
 import (
-	"bytes"
+	"encoding/json"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
 	"time"
@@ -50,6 +51,10 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
+	ID uuid.UUID `json:"id"`
+
+	Name string `json:"name"`
+
 	hub *Hub
 
 	// The websocket connection.
@@ -57,6 +62,21 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	hubs map[*Hub]bool
+
+	wsServer *WsServer
+}
+
+func newClient(conn *websocket.Conn, wsServer *WsServer, name string) *Client {
+	return &Client{
+		ID:       uuid.New(),
+		conn:     conn,
+		send:     make(chan []byte, 256),
+		hubs:     make(map[*Hub]bool),
+		wsServer: wsServer,
+		Name:     name,
+	}
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -64,24 +84,24 @@ type Client struct {
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
-func (c *Client) readPump() {
+func (client *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
+		client.disconnect()
 	}()
-	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	client.conn.SetReadLimit(maxMessageSize)
+	client.conn.SetReadDeadline(time.Now().Add(pongWait))
+	client.conn.SetPongHandler(func(string) error { client.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, jsonMessage, err := client.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
+		//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+		//client.hub.broadcast <- message
+		client.handleNewMessage(jsonMessage)
 	}
 }
 
@@ -90,41 +110,41 @@ func (c *Client) readPump() {
 // A goroutine running writePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
-func (c *Client) writePump() {
+func (client *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.conn.Close()
+		client.conn.Close()
 	}()
 	for {
 		select {
-		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+		case message, ok := <-client.send:
+			client.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				client.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
+			w, err := client.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
+			n := len(client.send)
 			for i := 0; i < n; i++ {
 				w.Write(newline)
-				w.Write(<-c.send)
+				w.Write(<-client.send)
 			}
 
 			if err := w.Close(); err != nil {
 				return
 			}
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			client.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := client.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}
@@ -132,17 +152,150 @@ func (c *Client) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func serveWs(wsServer *WsServer, w http.ResponseWriter, r *http.Request) {
+	name, ok := r.URL.Query()["name"]
+
+	if !ok || len(name[0]) < 1 {
+		log.Println("Url Param 'name' is missing")
+		return
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	client.hub.register <- client
+	client := newClient(conn, wsServer, name[0])
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
 	go client.writePump()
 	go client.readPump()
+	// new goroutines.
+	// Allow collection of memory referenced by the caller by doing all work in
+	wsServer.register <- client
+}
+
+func (client *Client) disconnect() {
+	client.wsServer.unregister <- client
+	for hub := range client.hubs {
+		hub.unregister <- client
+	}
+
+	close(client.send)
+	client.conn.Close()
+}
+
+func (client *Client) handleNewMessage(jsonMessage []byte) {
+
+	var message Message
+
+	if err := json.Unmarshal(jsonMessage, &message); err != nil {
+		log.Printf("Error on unmarshal JSON message %s", err)
+	}
+
+	// Attach the client object as the sender of the messsage.
+	message.Sender = client
+
+	switch message.Action {
+	case SendMessageAction:
+		hubID := message.Target.GetId()
+		// console.log the hubID
+		println(hubID)
+		if hub := client.wsServer.findHubByID(hubID); hub != nil {
+			hub.broadcast <- &message
+		}
+		// We delegate the join and leave actions.
+	case JoinHubAction:
+		client.handleJoinHubMessage(message)
+
+	case LeaveHubAction:
+		client.handleLeaveHubMessage(message)
+
+	case JoinHubPrivateAction:
+		client.handleJoinHubPrivateMessage(message)
+	}
+}
+
+// client.go
+func (client *Client) handleJoinHubMessage(message Message) {
+	hubName := message.Message
+
+	client.joinHub(hubName, nil)
+}
+
+func (client *Client) handleLeaveHubMessage(message Message) {
+	hub := client.wsServer.findHubByID(message.Message)
+	if hub == nil {
+		return
+	}
+	if _, ok := client.hubs[hub]; ok {
+		delete(client.hubs, hub)
+	}
+
+	hub.unregister <- client
+}
+
+// New method
+// When joining a private room we will combine the IDs of the users
+// Then we will bothe join the client and the target.
+func (client *Client) handleJoinHubPrivateMessage(message Message) {
+
+	target := client.wsServer.findClientByID(message.Message)
+	if target == nil {
+		return
+	}
+
+	// create unique room name combined to the two IDs
+	hubName := message.Message + client.ID.String()
+
+	client.joinHub(hubName, target)
+	target.joinHub(hubName, client)
+
+}
+
+// New method
+// Joining a room both for public and private roooms
+// When joiing a private room a sender is passed as the opposing party
+func (client *Client) joinHub(hubName string, sender *Client) {
+
+	room := client.wsServer.findHubByName(hubName)
+	if room == nil {
+		room = client.wsServer.createHub(hubName, sender != nil)
+	}
+
+	// Don't allow to join private rooms through public room message
+	if sender == nil && room.Private {
+		return
+	}
+
+	if !client.isInRoom(room) {
+		client.hubs[room] = true
+		room.register <- client
+		client.notifyRoomJoined(room, sender)
+	}
+
+}
+
+// New method
+// Check if the client is not yet in the room
+func (client *Client) isInRoom(hub *Hub) bool {
+	if _, ok := client.hubs[hub]; ok {
+		return true
+	}
+	return false
+}
+
+// New method
+// Notify the client of the new room he/she joined
+func (client *Client) notifyRoomJoined(hub *Hub, sender *Client) {
+	message := Message{
+		Action: HubJoinedAction,
+		Target: hub,
+		Sender: sender,
+	}
+
+	client.send <- message.encode()
+}
+
+func (client *Client) GetName() string {
+	return client.Name
 }

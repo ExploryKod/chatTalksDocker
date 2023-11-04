@@ -18,7 +18,8 @@ COPY ./gorillachat .
 
 RUN go mod download \
     && go mod verify \
-    && go mod tidy
+    && go mod tidy \
+    && go build -o gorillachat
 
 CMD ["go", "run", "."]
 

@@ -51,12 +51,21 @@ func main() {
 		port = "8000" // Default to port 8000 if PORT environment variable is not set
 	}
 
+	//conf := mysql.Config{
+	//	User:                 "u6ncknqjamhqpa3d",
+	//	Passwd:               "O1Bo5YwBLl31ua5agKoq",
+	//	Net:                  "tcp",
+	//	Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
+	//	DBName:               "bnouoawh6epgx2ipx4hl",
+	//	AllowNativePasswords: true,
+	//}
+
 	conf := mysql.Config{
-		User:                 "u6ncknqjamhqpa3d",
-		Passwd:               "O1Bo5YwBLl31ua5agKoq",
+		User:                 "root",
+		Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
 		Net:                  "tcp",
-		Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
-		DBName:               "bnouoawh6epgx2ipx4hl",
+		Addr:                 "database:3306",
+		DBName:               os.Getenv("MARIADB_DATABASE"),
 		AllowNativePasswords: true,
 	}
 
@@ -80,8 +89,8 @@ func main() {
 	}
 
 	flag.Parse()
-	hub := newHub()
-	go hub.run()
+	wsServer := NewWebsocketServer()
+	go wsServer.Run()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -97,29 +106,26 @@ func main() {
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
+	r.Post("/auth/register", handler.RegisterHandler)
+	r.Post("/auth/logged", handler.LoginHandler())
+
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 
 		r.Use(jwtauth.Authenticator)
-
+		// use JoinHub method to join a hub
 		r.Get("/chat/{id}", handler.JoinRoomHandler())
+		r.Get("/chat/rooms", handler.GetRooms())
 		r.Post("/chat/create", handler.CreateRoomHandler())
+		r.Get("/user-list", handler.GetUsers())
+		r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
+		r.Get("/update-user", handler.UpdateHandler)
 	})
 	// Define your routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
-	})
-
-	r.Get("/home", serveHome)
-
-	r.Get("/mychat", serveChatPage)
 
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r)
+		serveWs(wsServer, w, r)
 	})
-
-	r.Post("/auth/register", handler.RegisterHandler)
-	r.Post("/auth/logged", handler.LoginHandler())
 
 	server := &http.Server{
 		Addr:              port, // Replace with your desired address

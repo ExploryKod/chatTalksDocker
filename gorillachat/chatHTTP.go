@@ -4,6 +4,7 @@ type UserItem struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Admin    *int   `json:"admin"`
 }
 
 type RoomItem struct {
@@ -16,11 +17,14 @@ type RoomItem struct {
 type UserStoreInterface interface {
 	AddUser(item UserItem) (int, error)
 	GetUserByUsername(username string) (UserItem, error)
-	// GetUsers(username string) (UserItem, error)
+	GetUsers() ([]UserItem, error)
 	AddRoom(item RoomItem) (int, error)
 	GetRoomByName(name string) (RoomItem, error)
 	GetRoomById(id int) (RoomItem, error)
 	AddUserToRoom(roomID int, userID int) error
 	GetUsersFromRoom(roomID int) ([]UserItem, error)
 	GetOneUserFromRoom(roomID int, userID int) (UserItem, error)
+	GetRooms() ([]RoomItem, error)
+	DeleteUserById(id int) error
+	UpdateUser(item UserItem) error
 }

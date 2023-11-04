@@ -66,8 +66,7 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
+		c.disconnect()
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -129,6 +128,11 @@ func (c *Client) writePump() {
 			}
 		}
 	}
+}
+
+func (c *Client) disconnect() {
+	c.hub.unregister <- c
+	close(c.send)
 }
 
 // serveWs handles websocket requests from the peer.
