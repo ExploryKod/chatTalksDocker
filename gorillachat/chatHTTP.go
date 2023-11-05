@@ -21,6 +21,7 @@ type UserStoreInterface interface {
 	AddRoom(item RoomItem) (int, error)
 	GetRoomByName(name string) (RoomItem, error)
 	GetRoomById(id int) (RoomItem, error)
+	DeleteRoomById(id int) error
 	AddUserToRoom(roomID int, userID int) error
 	GetUsersFromRoom(roomID int) ([]UserItem, error)
 	GetOneUserFromRoom(roomID int, userID int) (UserItem, error)
