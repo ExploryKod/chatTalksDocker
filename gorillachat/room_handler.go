@@ -116,7 +116,7 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, claims, _ := jwtauth.FromContext(r.Context())
 		if username, ok := claims["username"].(string); ok {
-			user, err := h.Store.GetUserByUsername(username)
+			_, err := h.Store.GetUserByUsername(username)
 			if err != nil {
 				// Handle database error
 				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
