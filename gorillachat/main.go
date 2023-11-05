@@ -96,6 +96,7 @@ func main() {
 		r.Post("/chat/create", handler.CreateRoomHandler())
 		r.Get("/user-list", handler.GetUsers())
 		r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
+		r.Delete("/delete-room/{id}", handler.DeleteRoomHandler())
 		r.Get("/update-user", handler.UpdateHandler)
 	})
 	// Define your routes
