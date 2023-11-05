@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "start" ]; then
+  # If the argument is "start", bring the containers down and then up
+  docker-compose down
+  docker-compose up -d --build
+fi
+
 docker exec -it go-api sh -c "go install github.com/cosmtrek/air@latest"
 
 docker exec -it go-api sh -c "air init"

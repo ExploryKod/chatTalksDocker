@@ -73,8 +73,9 @@ func (server *WsServer) unregisterClient(client *Client) {
 // chatServer.go
 func (server *WsServer) notifyClientJoined(client *Client) {
 	message := &Message{
-		Action: UserJoinedAction,
-		Sender: client,
+		Action:  UserJoinedAction,
+		Sender:  client,
+		Message: client.Name + " joined the room",
 	}
 
 	server.broadcastToClients(message.encode())
@@ -82,8 +83,9 @@ func (server *WsServer) notifyClientJoined(client *Client) {
 
 func (server *WsServer) notifyClientLeft(client *Client) {
 	message := &Message{
-		Action: UserLeftAction,
-		Sender: client,
+		Action:  UserLeftAction,
+		Sender:  client,
+		Message: client.Name + " left the room",
 	}
 
 	server.broadcastToClients(message.encode())
@@ -92,8 +94,9 @@ func (server *WsServer) notifyClientLeft(client *Client) {
 func (server *WsServer) listOnlineClients(client *Client) {
 	for existingClient := range server.clients {
 		message := &Message{
-			Action: UserJoinedAction,
-			Sender: existingClient,
+			Action:  UserJoinedAction,
+			Sender:  existingClient,
+			Message: " you joined the room",
 		}
 		client.send <- message.encode()
 	}

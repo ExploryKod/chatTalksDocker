@@ -83,14 +83,14 @@ func (h *Handler) JoinRoomHandler() http.HandlerFunc {
 				return
 			}
 			if fromRoom.Username != "" {
-				h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome back in your room " + username})
+				h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Hi " + username + "Welcome back in your room"})
 				return
 			}
 			err = h.Store.AddUserToRoom(room.ID, user.ID)
 			if err != nil {
 				return
 			}
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome in your new room " + username})
+			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "you joined the room " + room.Name})
 		} else {
 			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
 		}
@@ -116,7 +116,7 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, claims, _ := jwtauth.FromContext(r.Context())
 		if username, ok := claims["username"].(string); ok {
-			user, err := h.Store.GetUserByUsername(username)
+			_, err := h.Store.GetUserByUsername(username)
 			if err != nil {
 				// Handle database error
 				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
