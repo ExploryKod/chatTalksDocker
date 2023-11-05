@@ -10,6 +10,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -20,31 +21,12 @@ type Handler struct {
 
 var addr = flag.String("addr", ":8080", "http service address")
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	if r.URL.Path != "/home" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
-	}
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	http.ServeFile(w, r, "home.html")
-}
-
-func serveChatPage(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Perform a redirect to /chat
-	http.Redirect(w, r, "/chat", http.StatusSeeOther)
-}
-
 func main() {
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000" // Default to port 8000 if PORT environment variable is not set
+	}
 
 	conf := mysql.Config{
 		User:                 "u6ncknqjamhqpa3d",
