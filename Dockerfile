@@ -21,5 +21,4 @@ RUN go mod download \
     && go mod tidy \
     && go build -o gorillachat
 
-CMD ["go", "run", "."]
 

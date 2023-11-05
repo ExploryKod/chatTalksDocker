@@ -126,3 +126,12 @@ func (t *UserStore) GetRooms() ([]RoomItem, error) {
 
 	return rooms, nil
 }
+
+func (t *UserStore) DeleteRoomById(id int) error {
+	_, err := t.DB.Exec("DELETE FROM Rooms WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

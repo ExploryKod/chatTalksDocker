@@ -140,3 +140,20 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 		}
 	}
 }
+
+func (h *Handler) DeleteRoomHandler() http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		QueryId := chi.URLParam(request, "id")
+
+		id, _ := strconv.Atoi(QueryId)
+
+		err := h.Store.DeleteRoomById(id)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		h.jsonResponse(writer, http.StatusOK, map[string]interface{}{"message": "Room " + strconv.Itoa(id) + " deleted"})
+		http.Redirect(writer, request, "/chat", http.StatusSeeOther)
+
+	}
+}
