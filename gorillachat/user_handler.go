@@ -9,18 +9,35 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 )
 
+type ErrorResponse struct {
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+}
+
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	existentUser, _ := h.Store.GetUserByUsername(username)
-	if existentUser.Username != "" {
-		http.Error(w, "User already exists", http.StatusBadRequest)
+	existentUser, err := h.Store.GetUserByUsername(username)
+	if err != nil {
+		//http.Error(w, "User already exists", http.StatusBadRequest)
+		//errorResponse := ErrorResponse{
+		//	Message: "L'utilisateur ${username} existe déjà",
+		//	Code:    http.StatusBadRequest,
+		//}
+		//h.jsonResponse(w, http.StatusBadRequest, errorResponse)
+		response := map[string]interface{}{
+			"message": "User already exists",
+			"code":    http.StatusBadRequest,
+		}
+		h.jsonResponse(w, response)
+		h.jsonResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "L'utilisateur existe déjà", "code": http.StatusBadRequest})
 		return
-	} else {
+	} else if existentUser.Username != username {
 		userID, err := h.Store.AddUser(UserItem{Username: username, Password: password})
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			//http.Error(w, err.Error(), http.StatusInternalServerError)
+			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{"message": "l'utilisateur n'a pu être ajouté"})
 			return
 		}
 		// Respond with a success message

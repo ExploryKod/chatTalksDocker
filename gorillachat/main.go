@@ -19,8 +19,6 @@ type Handler struct {
 	*Store
 }
 
-var addr = flag.String("addr", ":8080", "http service address")
-
 func main() {
 
 	port := os.Getenv("PORT")
@@ -69,10 +67,10 @@ func main() {
 	wsServer := NewWebsocketServer()
 	go wsServer.Run()
 
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	//r := chi.NewRouter()
+	handler.Use(middleware.Logger)
 
-	r.Use(cors.Handler(cors.Options{
+	handler.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
@@ -83,10 +81,10 @@ func main() {
 		MaxAge:           300,  // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Post("/auth/register", handler.RegisterHandler)
-	r.Post("/auth/logged", handler.LoginHandler())
+	handler.Post("/auth/register", handler.RegisterHandler)
+	handler.Post("/auth/logged", handler.LoginHandler())
 
-	r.Group(func(r chi.Router) {
+	handler.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 
 		r.Use(jwtauth.Authenticator)
@@ -101,7 +99,7 @@ func main() {
 	})
 	// Define your routes
 
-	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
+	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(wsServer, w, r)
 	})
 
