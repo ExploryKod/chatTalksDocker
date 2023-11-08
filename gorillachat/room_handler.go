@@ -90,7 +90,7 @@ func (h *Handler) JoinRoomHandler() http.HandlerFunc {
 			if err != nil {
 				return
 			}
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "you joined the room " + room.Name})
+			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "joined this room " + room.Name})
 		} else {
 			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
 		}
@@ -125,7 +125,8 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 				return
 			}
 			roomName := r.FormValue("roomName")
-			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: "coquelicots"})
+			description := r.FormValue("description")
+			roomId, err := h.Store.AddRoom(RoomItem{Name: roomName, Description: description})
 			if err != nil {
 				// Handle database error
 				h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{
@@ -133,8 +134,8 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 				})
 				return
 			}
-
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome " + username, "roomID": roomId})
+			response := map[string]interface{}{"id": roomId, "name": roomName, "description": description}
+			h.jsonResponse(w, http.StatusOK, response)
 		} else {
 			h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"error": "Unauthorized"})
 		}

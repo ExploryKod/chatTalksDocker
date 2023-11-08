@@ -75,7 +75,7 @@ func (server *WsServer) notifyClientJoined(client *Client) {
 	message := &Message{
 		Action:  UserJoinedAction,
 		Sender:  client,
-		Message: client.Name + " joined the room",
+		Message: client.Name + " a rejoint la salle",
 	}
 
 	server.broadcastToClients(message.encode())
@@ -85,7 +85,7 @@ func (server *WsServer) notifyClientLeft(client *Client) {
 	message := &Message{
 		Action:  UserLeftAction,
 		Sender:  client,
-		Message: client.Name + " left the room",
+		Message: client.Name + " a quitté la salle",
 	}
 
 	server.broadcastToClients(message.encode())
@@ -96,7 +96,7 @@ func (server *WsServer) listOnlineClients(client *Client) {
 		message := &Message{
 			Action:  UserJoinedAction,
 			Sender:  existingClient,
-			Message: " you joined the room",
+			Message: existingClient.Name + " a rejoint la salle",
 		}
 		client.send <- message.encode()
 	}

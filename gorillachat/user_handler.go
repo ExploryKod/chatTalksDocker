@@ -9,11 +9,6 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 )
 
-type ErrorResponse struct {
-	Message string `json:"message"`
-	Code    int    `json:"code"`
-}
-
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
 	username := r.FormValue("username")
@@ -26,11 +21,7 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		//	Code:    http.StatusBadRequest,
 		//}
 		//h.jsonResponse(w, http.StatusBadRequest, errorResponse)
-		response := map[string]interface{}{
-			"message": "User already exists",
-			"code":    http.StatusBadRequest,
-		}
-		h.jsonResponse(w, response)
+
 		h.jsonResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "L'utilisateur existe déjà", "code": http.StatusBadRequest})
 		return
 	} else if existentUser.Username != username {

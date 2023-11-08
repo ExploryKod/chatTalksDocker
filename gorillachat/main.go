@@ -106,7 +106,7 @@ func main() {
 	server := &http.Server{
 		Addr:              ":8000", // Replace with your desired address
 		ReadHeaderTimeout: 3 * time.Second,
-		Handler:           r, // Use the chi router as the handler
+		Handler:           handler, // Use the chi router as the handler
 	}
 
 	err = server.ListenAndServe()

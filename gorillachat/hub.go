@@ -82,7 +82,7 @@ func (h *Hub) GetName() string {
 	return h.Name
 }
 
-const welcomeMessage = "%s joined the room"
+const welcomeMessage = "%s a rejoint la salle !"
 
 func (h *Hub) notifyClientJoined(client *Client) {
 	message := &Message{
