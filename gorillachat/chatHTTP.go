@@ -14,6 +14,15 @@ type RoomItem struct {
 	Clients     map[string]*Client `json:"-"`
 }
 
+type MessageItem struct {
+	ID        int    `json:"id"`
+	Content   string `json:"content"`
+	Username  string `json:"username"`
+	UserID    int    `json:"user_id"`
+	RoomID    int    `json:"room_id"`
+	CreatedAt string `json:"created_at"`
+}
+
 type UserStoreInterface interface {
 	AddUser(item UserItem) (int, error)
 	GetUserByUsername(username string) (UserItem, error)
@@ -28,4 +37,5 @@ type UserStoreInterface interface {
 	GetRooms() ([]RoomItem, error)
 	DeleteUserById(id int) error
 	UpdateUser(item UserItem) error
+	AddMessage(item MessageItem) (int, error)
 }

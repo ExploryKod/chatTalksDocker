@@ -96,8 +96,8 @@ func main() {
 		r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
 		r.Delete("/delete-room/{id}", handler.DeleteRoomHandler())
 		r.Get("/update-user", handler.UpdateHandler)
+		r.Post("/send-message", handler.CreateMessageHandler)
 	})
-	// Define your routes
 
 	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(wsServer, w, r)
