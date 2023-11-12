@@ -42,8 +42,8 @@ func (t *UserStore) GetUsers() ([]UserItem, error) {
 func (t *UserStore) GetUserByUsername(username string) (UserItem, error) {
 	var user UserItem
 
-	err := t.QueryRow("SELECT id, username, password FROM Users WHERE username = ?", username).
-		Scan(&user.ID, &user.Username, &user.Password)
+	err := t.QueryRow("SELECT id, username, password, admin FROM Users WHERE username = ?", username).
+		Scan(&user.ID, &user.Username, &user.Password, &user.Admin)
 
 	if err == sql.ErrNoRows {
 		// User not found

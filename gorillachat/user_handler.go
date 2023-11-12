@@ -49,32 +49,6 @@ func MakeToken(name string) string {
 	return tokenString
 }
 
-//func loginJWTHandler(w http.ResponseWriter, r *http.Request) {
-//	username, password, ok := r.BasicAuth()
-//	if !ok {
-//		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-//		return
-//	}
-//
-//	// Perform authentication (e.g., check credentials against a database)
-//	if isValidCredentials(username, password) {
-//		// Generate a JWT
-//		_, tokenString, _ := tokenAuth.Encode(jwt.MapClaims{"username": username, "exp": time.Now().Add(time.Hour).Unix()})
-//
-//		// Respond with the JWT
-//		response := map[string]string{"token": tokenString}
-//		json.NewEncoder(w).Encode(response)
-//	} else {
-//		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-//	}
-//}
-//
-//func isValidCredentials(username, password string) bool {
-//	// Implement your authentication logic here (e.g., check against a database)
-//	// Return true if the credentials are valid, otherwise false.
-//	return true
-//}
-
 func (h *Handler) LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -93,7 +67,8 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 		}
 
 		if user.Username == "" || user.Password == "" {
-			http.Error(w, "Il reste des champs vide", http.StatusBadRequest)
+			response := map[string]string{"message": "Vous n'avez pas complété tous les champs"}
+			h.jsonResponse(w, http.StatusBadRequest, response)
 			return
 		}
 
@@ -113,13 +88,9 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			// Successful login
 
 			// Convert role (admin column) to string
-			var roleStr string
-			if user.Admin == 1 {
-				roleStr = "1"
-			} else {
-				roleStr = "0"
-			}
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "role": roleStr}
+			roleStr := strconv.Itoa(user.Admin)
+
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "admin": roleStr}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
