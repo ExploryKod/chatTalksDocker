@@ -89,8 +89,9 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 
 			// Convert role (admin column) to string
 			roleStr := strconv.Itoa(user.Admin)
+			email := *user.Email
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "admin": roleStr}
+			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "admin": roleStr, "email": email}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login
@@ -129,27 +130,20 @@ func (h *Handler) GetUsers() http.HandlerFunc {
 func (h *Handler) UpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Extract registration data
 		username := r.FormValue("username")
 		role := r.FormValue("role")
 		userID := r.FormValue("id")
 		id, _ := strconv.Atoi(userID)
 		admin, _ := strconv.Atoi(role)
 
-		existentUser, _ := h.Store.GetUserByUsername(username)
-		if existentUser.Username != "" {
-
-			err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin})
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			// Respond with a success message
-			h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Update successful"})
-		} else {
-			http.Error(w, "No user with this id found", http.StatusBadRequest)
+		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Update successful"})
+
 	}
 }
 

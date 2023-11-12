@@ -43,7 +43,7 @@ func (t *UserStore) GetUserByUsername(username string) (UserItem, error) {
 	var user UserItem
 
 	err := t.QueryRow("SELECT id, username, password, admin, email FROM Users WHERE username = ?", username).
-		Scan(&user.ID, &user.Username, &user.Password, &user.Admin)
+		Scan(&user.ID, &user.Username, &user.Password, &user.Admin, &user.Email)
 
 	if err == sql.ErrNoRows {
 		// User not found
@@ -72,7 +72,7 @@ func (t *UserStore) AddUser(item UserItem) (int, error) {
 
 func (t *UserStore) UpdateUser(item UserItem) error {
 
-	_, err := t.DB.Exec("UPDATE Users SET username = ?, admin = ? WHERE id = ?", item.Username, item.Admin, item.ID)
+	_, err := t.DB.Exec("UPDATE Users SET username = ?, admin = ?, email = ? WHERE id = ?", item.Username, item.Admin, item.Email, item.ID)
 	if err != nil {
 		return err
 	}
