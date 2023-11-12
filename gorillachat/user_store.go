@@ -72,7 +72,18 @@ func (t *UserStore) AddUser(item UserItem) (int, error) {
 
 func (t *UserStore) UpdateUser(item UserItem) error {
 
-	_, err := t.DB.Exec("UPDATE Users SET username = ?, password = ?, admin = ? WHERE id = ?", item.Username, item.Password, item.Admin, item.ID)
+	_, err := t.DB.Exec("UPDATE Users SET username = ?, admin = ? WHERE id = ?", item.Username, item.Admin, item.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (t *UserStore) UpdateUserPassword(item UserItem) error {
+
+	_, err := t.DB.Exec("UPDATE Users SET password = ? WHERE id = ?", item.Password, item.ID)
 	if err != nil {
 		return err
 	}

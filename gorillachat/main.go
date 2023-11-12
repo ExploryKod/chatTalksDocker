@@ -95,7 +95,7 @@ func main() {
 		r.Get("/user-list", handler.GetUsers())
 		r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
 		r.Delete("/delete-room/{id}", handler.DeleteRoomHandler())
-		r.Get("/update-user", handler.UpdateHandler)
+		r.Get("/update-user/{id}", handler.UpdateHandler)
 	})
 	// Define your routes
 

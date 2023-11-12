@@ -4,7 +4,7 @@ type UserItem struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Admin    *int   `json:"admin"`
+	Admin    int    `json:"admin"`
 }
 
 type RoomItem struct {
@@ -28,4 +28,5 @@ type UserStoreInterface interface {
 	GetRooms() ([]RoomItem, error)
 	DeleteUserById(id int) error
 	UpdateUser(item UserItem) error
+	UpdateUserPassword(item UserItem) error
 }

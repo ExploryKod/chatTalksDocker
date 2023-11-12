@@ -161,13 +161,15 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Extract registration data
 	username := r.FormValue("username")
-	password := r.FormValue("password")
+	role := r.FormValue("role")
 	userID := r.FormValue("id")
 	id, _ := strconv.Atoi(userID)
+	admin, _ := strconv.Atoi(role)
+
 	existentUser, _ := h.Store.GetUserByUsername(username)
 	if existentUser.Username != "" {
 
-		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Password: password})
+		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
