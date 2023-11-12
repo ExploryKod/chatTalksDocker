@@ -95,7 +95,7 @@ func main() {
 		r.Get("/user-list", handler.GetUsers())
 		r.Delete("/delete-user/{id}", handler.DeleteUserHandler())
 		r.Delete("/delete-room/{id}", handler.DeleteRoomHandler())
-		r.Post("/update-user/{id}", handler.UpdateHandler)
+		r.Post("/update-user", handler.UpdateHandler())
 		r.Post("/send-message", handler.CreateMessageHandler)
 	})
 
