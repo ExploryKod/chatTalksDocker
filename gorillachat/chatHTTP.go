@@ -5,6 +5,7 @@ type UserItem struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Admin    int    `json:"admin"`
+	Email    string `json:"email"`
 }
 
 type RoomItem struct {

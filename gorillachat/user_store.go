@@ -17,7 +17,7 @@ type UserStore struct {
 func (t *UserStore) GetUsers() ([]UserItem, error) {
 	var users []UserItem
 
-	rows, err := t.Query("SELECT id, username, password, admin FROM Users")
+	rows, err := t.Query("SELECT id, username, password, admin, email FROM Users")
 	if err != nil {
 		return []UserItem{}, err
 	}
@@ -26,7 +26,7 @@ func (t *UserStore) GetUsers() ([]UserItem, error) {
 
 	for rows.Next() {
 		var user UserItem
-		if err = rows.Scan(&user.ID, &user.Username, &user.Password, &user.Admin); err != nil {
+		if err = rows.Scan(&user.ID, &user.Username, &user.Password, &user.Admin, &user.Email); err != nil {
 			return []UserItem{}, err
 		}
 		users = append(users, user)
@@ -42,7 +42,7 @@ func (t *UserStore) GetUsers() ([]UserItem, error) {
 func (t *UserStore) GetUserByUsername(username string) (UserItem, error) {
 	var user UserItem
 
-	err := t.QueryRow("SELECT id, username, password, admin FROM Users WHERE username = ?", username).
+	err := t.QueryRow("SELECT id, username, password, admin, email FROM Users WHERE username = ?", username).
 		Scan(&user.ID, &user.Username, &user.Password, &user.Admin)
 
 	if err == sql.ErrNoRows {
