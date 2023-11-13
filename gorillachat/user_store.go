@@ -56,6 +56,23 @@ func (t *UserStore) GetUserByUsername(username string) (UserItem, error) {
 	return user, nil
 }
 
+func (t *UserStore) GetUserById(id int) (UserItem, error) {
+	var user UserItem
+
+	err := t.QueryRow("SELECT id, username, password, admin, email FROM Users WHERE id = ?", id).
+		Scan(&user.ID, &user.Username, &user.Password, &user.Admin, &user.Email)
+
+	if err == sql.ErrNoRows {
+		// User not found
+		return UserItem{}, nil
+	} else if err != nil {
+		// Handle other database errors
+		return UserItem{}, err
+	}
+
+	return user, nil
+}
+
 func (t *UserStore) AddUser(item UserItem) (int, error) {
 	res, err := t.DB.Exec("INSERT INTO Users (username, password) VALUES (?, ?)", item.Username, item.Password)
 	if err != nil {

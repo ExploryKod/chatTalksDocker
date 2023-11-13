@@ -142,6 +142,25 @@ func (h *Handler) CreateRoomHandler() http.HandlerFunc {
 	}
 }
 
+func (h *Handler) UpdateRoomHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		name := r.FormValue("name")
+		roomID := r.FormValue("id")
+		description := r.FormValue("description")
+		id, _ := strconv.Atoi(roomID)
+
+		err := h.Store.UpdateRoom(RoomItem{ID: id, Name: name, Description: description})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Salle modifiée", "name": name, "theme": description})
+
+	}
+}
+
 func (h *Handler) DeleteRoomHandler() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		QueryId := chi.URLParam(request, "id")

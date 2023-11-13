@@ -36,6 +36,7 @@ type UserStoreInterface interface {
 	GetUsersFromRoom(roomID int) ([]UserItem, error)
 	GetOneUserFromRoom(roomID int, userID int) (UserItem, error)
 	GetRooms() ([]RoomItem, error)
+	UpdateRoom(item RoomItem) error
 	DeleteUserById(id int) error
 	UpdateUser(item UserItem) error
 	UpdateUserPassword(item UserItem) error

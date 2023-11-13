@@ -131,18 +131,19 @@ func (h *Handler) UpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		username := r.FormValue("username")
-		role := r.FormValue("role")
+		role := r.FormValue("admin")
 		userID := r.FormValue("id")
+		email := r.FormValue("email")
 		id, _ := strconv.Atoi(userID)
 		admin, _ := strconv.Atoi(role)
 
-		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin})
+		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin, Email: &email})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Update successful"})
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Utilisateur modifié", "username": username, "statut": role, "email": email})
 
 	}
 }
