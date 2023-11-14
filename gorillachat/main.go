@@ -98,6 +98,7 @@ func main() {
 		r.Post("/update-user", handler.UpdateHandler())
 		r.Post("/update-room", handler.UpdateRoomHandler())
 		r.Post("/send-message", handler.CreateMessageHandler)
+		r.Get("/get-messages/{id}", handler.GetMessageHandler)
 	})
 
 	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {

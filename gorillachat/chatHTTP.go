@@ -41,4 +41,5 @@ type UserStoreInterface interface {
 	UpdateUser(item UserItem) error
 	UpdateUserPassword(item UserItem) error
 	AddMessage(item MessageItem) (int, error)
+	GetMessagesFromRoom(id int) (MessageItem, error)
 }
