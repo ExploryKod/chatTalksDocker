@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"time"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -89,6 +90,7 @@ func (h *Hub) notifyClientJoined(client *Client) {
 		Action:  SendMessageAction,
 		Target:  h,
 		Message: fmt.Sprintf(welcomeMessage, client.GetName()),
+		Time:    getTime(),
 	}
 
 	h.broadcastToClientsInHub(message.encode())
@@ -98,4 +100,11 @@ func (h *Hub) Hub(client *Client) {
 	// by sending the message first the new user won't see his own message.
 	h.notifyClientJoined(client)
 	h.clients[client] = true
+}
+
+func getTime() string {
+	theTime := time.Now()
+	fmt.Println("The time is", theTime)
+
+	return theTime.Format("2006-01-02 03:04:05 pm")
 }

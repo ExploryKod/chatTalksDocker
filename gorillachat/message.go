@@ -18,6 +18,7 @@ type Message struct {
 	Message string  `json:"message"`
 	Target  *Hub    `json:"target"`
 	Sender  *Client `json:"sender"`
+	Time    string  `json:"time"`
 }
 
 func (message *Message) encode() []byte {
