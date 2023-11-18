@@ -1,11 +1,11 @@
 package main
 
 type UserItem struct {
-	ID       int     `json:"id"`
-	Username string  `json:"username"`
-	Password string  `json:"password"`
-	Admin    int     `json:"admin"`
-	Email    *string `json:"email"`
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Admin    int    `json:"admin"`
+	Email    string `json:"email"`
 }
 
 type RoomItem struct {

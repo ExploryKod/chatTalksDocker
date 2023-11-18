@@ -13,26 +13,20 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	email := r.FormValue("email")
 	existentUser, err := h.Store.GetUserByUsername(username)
 	if err != nil {
-		//http.Error(w, "User already exists", http.StatusBadRequest)
-		//errorResponse := ErrorResponse{
-		//	Message: "L'utilisateur ${username} existe déjà",
-		//	Code:    http.StatusBadRequest,
-		//}
-		//h.jsonResponse(w, http.StatusBadRequest, errorResponse)
-
 		h.jsonResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "L'utilisateur existe déjà", "code": http.StatusBadRequest})
 		return
 	} else if existentUser.Username != username {
-		userID, err := h.Store.AddUser(UserItem{Username: username, Password: password})
+		userID, err := h.Store.AddUser(UserItem{Username: username, Password: password, Email: email, Admin: 0})
 		if err != nil {
 			//http.Error(w, err.Error(), http.StatusInternalServerError)
 			h.jsonResponse(w, http.StatusInternalServerError, map[string]interface{}{"message": "l'utilisateur n'a pu être ajouté"})
 			return
 		}
 		// Respond with a success message
-		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Registration successful", "userID": userID})
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Vous êtes bien inscris: connectez-vous pour chatter", "userID": userID})
 	}
 }
 
@@ -66,12 +60,6 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			return
 		}
 
-		if user.Username == "" || user.Password == "" {
-			response := map[string]string{"message": "Vous n'avez pas complété tous les champs"}
-			h.jsonResponse(w, http.StatusBadRequest, response)
-			return
-		}
-
 		// Check if the user exists and the password matches
 		if user.Username == username && user.Password == password {
 			token := MakeToken(username)
@@ -89,7 +77,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 
 			// Convert role (admin column) to string
 			roleStr := strconv.Itoa(user.Admin)
-			email := *user.Email
+			email := user.Email
 
 			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "admin": roleStr, "email": email}
 			h.jsonResponse(w, http.StatusOK, response)
@@ -137,7 +125,7 @@ func (h *Handler) UpdateHandler() http.HandlerFunc {
 		id, _ := strconv.Atoi(userID)
 		admin, _ := strconv.Atoi(role)
 
-		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin, Email: &email})
+		err := h.Store.UpdateUser(UserItem{ID: id, Username: username, Admin: admin, Email: email})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
