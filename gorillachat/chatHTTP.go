@@ -42,4 +42,5 @@ type UserStoreInterface interface {
 	UpdateUserPassword(item UserItem) error
 	AddMessage(item MessageItem) (int, error)
 	GetMessagesFromRoom(id int) ([]MessageItem, error)
+	DeleteMessagesByRoomId(id int) error
 }

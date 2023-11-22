@@ -26,23 +26,23 @@ func main() {
 		port = "8000" // Default to port 8000 if PORT environment variable is not set
 	}
 
-	//conf := mysql.Config{
-	//	User:                 "u6ncknqjamhqpa3d",
-	//	Passwd:               "O1Bo5YwBLl31ua5agKoq",
-	//	Net:                  "tcp",
-	//	Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
-	//	DBName:               "bnouoawh6epgx2ipx4hl",
-	//	AllowNativePasswords: true,
-	//}
-
 	conf := mysql.Config{
-		User:                 "root",
-		Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
+		User:                 "u6ncknqjamhqpa3d",
+		Passwd:               "O1Bo5YwBLl31ua5agKoq",
 		Net:                  "tcp",
-		Addr:                 "database:3306",
-		DBName:               os.Getenv("MARIADB_DATABASE"),
+		Addr:                 "bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306",
+		DBName:               "bnouoawh6epgx2ipx4hl",
 		AllowNativePasswords: true,
 	}
+
+	//conf := mysql.Config{
+	//	User:                 "root",
+	//	Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
+	//	Net:                  "tcp",
+	//	Addr:                 "database:3306",
+	//	DBName:               os.Getenv("MARIADB_DATABASE"),
+	//	AllowNativePasswords: true,
+	//}
 
 	db, err := sql.Open("mysql", conf.FormatDSN())
 	if err != nil {
@@ -99,6 +99,8 @@ func main() {
 		r.Post("/update-room", handler.UpdateRoomHandler())
 		r.Post("/send-message", handler.CreateMessageHandler)
 		r.Get("/chat/messages/{id}", handler.GetMessageHandler)
+		r.Get("/messages/room/delete-history/{id}", handler.DeleteMessageFromRoomHandler())
+		r.Get("/messages/user/delete-history/{id}", handler.DeleteMessageFromRoomHandler())
 	})
 
 	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {

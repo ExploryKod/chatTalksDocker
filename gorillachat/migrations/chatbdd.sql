@@ -51,8 +51,8 @@ CREATE TABLE `Users` (
 -- Déchargement des données de la table `Users`
 --
 
-INSERT INTO `Users` (`id`, `username`, `password`, `admin`) VALUES
-(1, 'admin', 'admin', 1);
+INSERT INTO `Users` (`id`, `username`, `password`, `admin`, `email`) VALUES
+(1, 'nass', 'nass', 1, 'wainting@noreply.com');
 
 -- --------------------------------------------------------
 

@@ -3,17 +3,30 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"net/mail"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
 )
 
+func valid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
+}
+
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract registration data
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	email := r.FormValue("email")
+	emailFromClient := r.FormValue("email")
+	emailChecked := valid(emailFromClient)
+	var email string
+	if emailChecked == false || emailFromClient == "" {
+		email = "waiting@noemail.com"
+	} else {
+		email = emailFromClient
+	}
 	existentUser, err := h.Store.GetUserByUsername(username)
 	if err != nil {
 		h.jsonResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "L'utilisateur existe déjà", "code": http.StatusBadRequest})
