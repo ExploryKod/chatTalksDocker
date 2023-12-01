@@ -45,6 +45,7 @@ CREATE TABLE `Users` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `admin` tinyint(1) DEFAULT '0'
+  `email` varchar(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
