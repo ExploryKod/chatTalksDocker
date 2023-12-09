@@ -32,7 +32,7 @@ func (h *Handler) CreateMessageHandler(w http.ResponseWriter, r *http.Request) {
 		h.jsonResponse(w, http.StatusUnauthorized, map[string]interface{}{"message": "Vous avez atteint la limite des sauvegardes de vos messages en base de donnée", "roomID": roomIDInt, "userID": sender.ID})
 		return
 	} else if messagesNumber >= 2 {
-		http.Error(w, "You can't send more than"+strconv.Itoa(maxMessageTableRows)+"messages to bdd", http.StatusUnauthorized)
+		http.Error(w, "You can't send more than "+strconv.Itoa(maxMessageTableRows)+" messages to bdd", http.StatusUnauthorized)
 		return
 	} else {
 		http.Error(w, "Requête non-satisfaite", http.StatusBadRequest)
@@ -42,6 +42,7 @@ func (h *Handler) CreateMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetMessageHandler(w http.ResponseWriter, r *http.Request) {
 	roomID := chi.URLParam(r, "id")
+
 	var id, err = strconv.Atoi(roomID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,7 +55,13 @@ func (h *Handler) GetMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Messages found", "messages": messages})
+	messagesNumber, _ := h.Store.CountMessagesSent()
+	maxMessageTableRows := 2
+	if messagesNumber >= maxMessageTableRows {
+		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Vous avez " + strconv.Itoa(messagesNumber) + " sauvegardés en base: c'est le nombre maximal possible avec votre forfait gratuit", "messages": messages})
+	}
+
+	h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Vous avez des messages", "messages": messages})
 }
 
 func (h *Handler) DeleteMessageFromRoomHandler() http.HandlerFunc {
