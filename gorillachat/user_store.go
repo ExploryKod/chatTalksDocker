@@ -74,7 +74,7 @@ func (t *UserStore) GetUserById(id int) (UserItem, error) {
 }
 
 func (t *UserStore) AddUser(item UserItem) (int, error) {
-	res, err := t.DB.Exec("INSERT INTO Users (username, password) VALUES (?, ?)", item.Username, item.Password)
+	res, err := t.DB.Exec("INSERT INTO Users (username, password, email, admin) VALUES (?, ?, ?, ?)", item.Username, item.Password, item.Email, item.Admin)
 	if err != nil {
 		return 0, err
 	}

@@ -26,6 +26,8 @@ func main() {
 		port = "8000" // Default to port 8000 if PORT environment variable is not set
 	}
 
+	//psql 'postgresql://ExploryKod:0PqEazdVC2RJ@ep-square-block-44724621-pooler.eu-central-1.aws.neon.tech/chatdb?sslmode=require'
+
 	conf := mysql.Config{
 		User:                 "u6ncknqjamhqpa3d",
 		Passwd:               "O1Bo5YwBLl31ua5agKoq",
@@ -99,6 +101,7 @@ func main() {
 		r.Post("/update-room", handler.UpdateRoomHandler())
 		r.Post("/send-message", handler.CreateMessageHandler)
 		r.Get("/chat/messages/{id}", handler.GetMessageHandler)
+		r.Get("/messages/room/delete-history/{id}", handler.DeleteMessageFromRoomHandler())
 	})
 
 	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {

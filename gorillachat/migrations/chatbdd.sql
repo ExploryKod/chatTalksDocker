@@ -45,14 +45,15 @@ CREATE TABLE `Users` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `admin` tinyint(1) DEFAULT '0'
+  `email` varchar(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `Users`
 --
 
-INSERT INTO `Users` (`id`, `username`, `password`, `admin`) VALUES
-(1, 'admin', 'admin', 1);
+INSERT INTO `Users` (`id`, `username`, `password`, `admin`, `email`) VALUES
+(1, 'nass', 'nass', 1, 'wainting@noreply.com');
 
 -- --------------------------------------------------------
 
