@@ -1,129 +1,78 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Hôte : bnouoawh6epgx2ipx4hl-mysql.services.clever-cloud.com:3306
--- Généré le : dim. 22 oct. 2023 à 20:07
--- Version du serveur : 8.0.22-13
--- Version de PHP : 8.2.11
+-- Adminer 4.8.1 MySQL 8.0.22-13 dump
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+SET NAMES utf8;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de données : `bnouoawh6epgx2ipx4hl`
---
-
--- --------------------------------------------------------
-
---
--- Structure de la table `Rooms`
---
-
+DROP TABLE IF EXISTS `Rooms`;
 CREATE TABLE `Rooms` (
-                         `id` int NOT NULL,
+                         `id` int NOT NULL AUTO_INCREMENT,
                          `name` varchar(255) NOT NULL,
                          `description` text NOT NULL,
-                         `private` tinyint(1) DEFAULT '0'
+                         `private` tinyint(1) DEFAULT '0',
+                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+INSERT INTO `Rooms` (`id`, `name`, `description`, `private`) VALUES
+                                                                 (33,	'bistrot Birdies',	'Boire du café et jouer',	0),
+                                                                 (35,	'Ragnarok',	'Parler de l\'aprés chez les Vikings',	0),
+(36,	'école de nassim',	'Apprendre l\'arabe littéraire avec Nassim',	0),
+                                                                 (37,	'cabinet des curiosités',	'Parler de choses surprenantes',	0),
+                                                                 (39,	'Mariage',	'mariées',	0);
 
---
--- Structure de la table `Users`
---
+DROP TABLE IF EXISTS `User_Room`;
+CREATE TABLE `User_Room` (
+                             `id` int NOT NULL AUTO_INCREMENT,
+                             `user_id` int NOT NULL,
+                             `room_id` int NOT NULL,
+                             PRIMARY KEY (`id`),
+                             KEY `user_id` (`user_id`),
+                             KEY `room_id` (`room_id`),
+                             CONSTRAINT `room_id` FOREIGN KEY (`room_id`) REFERENCES `Rooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+                             CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `User_Room` (`id`, `user_id`, `room_id`) VALUES
+                                                         (31,	31,	33),
+                                                         (32,	35,	33),
+                                                         (35,	35,	35),
+                                                         (36,	31,	35),
+                                                         (37,	31,	36),
+                                                         (38,	31,	39),
+                                                         (39,	43,	35);
+
+DROP TABLE IF EXISTS `Users`;
 CREATE TABLE `Users` (
-                         `id` int NOT NULL,
+                         `id` int NOT NULL AUTO_INCREMENT,
                          `username` varchar(255) NOT NULL,
                          `password` varchar(255) NOT NULL,
-                         `admin` tinyint(1) DEFAULT '0'
+                         `admin` tinyint(1) DEFAULT '0',
+                         `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Déchargement des données de la table `Users`
---
+INSERT INTO `Users` (`id`, `username`, `password`, `admin`, `email`) VALUES
+                                                                         (31,	'nass',	'nass',	1,	'waitingemail@noreply.com'),
+                                                                         (35,	'amaury',	'Sky@900',	1,	'amauryfranssen@gmail.com'),
+                                                                         (43,	'amo',	'Sky@900',	0,	'waiting@noemail.com');
 
-INSERT INTO `Users` (`id`, `username`, `password`, `admin`) VALUES
-    (1, 'admin', 'admin', 1);
+SET NAMES utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `User_Room`
---
-
-CREATE TABLE `User_Room` (
-                             `id` int NOT NULL,
-                             `user_id` int NOT NULL,
-                             `room_id` int NOT NULL
+DROP TABLE IF EXISTS `messages`;
+CREATE TABLE `messages` (
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `room_id` int NOT NULL,
+                            `user_id` int NOT NULL,
+                            `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                            `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+                            `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            `Status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `user_id` (`user_id`),
+                            KEY `room_id` (`room_id`),
+                            CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
+                            CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `Rooms` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Index pour les tables déchargées
---
-
---
--- Index pour la table `Rooms`
---
-ALTER TABLE `Rooms`
-    ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `Users`
---
-ALTER TABLE `Users`
-    ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `User_Room`
---
-ALTER TABLE `User_Room`
-    ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `room_id` (`room_id`);
-
---
--- AUTO_INCREMENT pour les tables déchargées
---
-
---
--- AUTO_INCREMENT pour la table `Rooms`
---
-ALTER TABLE `Rooms`
-    MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `Users`
---
-ALTER TABLE `Users`
-    MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT pour la table `User_Room`
---
-ALTER TABLE `User_Room`
-    MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- Contraintes pour les tables déchargées
---
-
---
--- Contraintes pour la table `User_Room`
---
-ALTER TABLE `User_Room`
-    ADD CONSTRAINT `room_id` FOREIGN KEY (`room_id`) REFERENCES `Rooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  ADD CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- 2023-12-01 22:37:41
