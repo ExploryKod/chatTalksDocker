@@ -37,6 +37,7 @@ func (h *Handler) CreateMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetMessageHandler(w http.ResponseWriter, r *http.Request) {
 	roomID := chi.URLParam(r, "id")
+
 	var id, err = strconv.Atoi(roomID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
