@@ -19,7 +19,9 @@ INSERT INTO `Rooms` (`id`, `name`, `description`, `private`) VALUES
                                                                  (35,	'Ragnarok',	'Parler de l\'aprés chez les Vikings',	0),
 (36,	'école de nassim',	'Apprendre l\'arabe littéraire avec Nassim',	0),
                                                                  (37,	'cabinet des curiosités',	'Parler de choses surprenantes',	0),
-                                                                 (39,	'Mariage',	'mariées',	0);
+                                                                 (39,	'Mariage',	'mariées',	0),
+                                                                 (40,	'ramen',	'Cuisine Japonaise',	0),
+                                                                 (41,	'Sénégale',	'Dakar',	0);
 
 DROP TABLE IF EXISTS `User_Room`;
 CREATE TABLE `User_Room` (
@@ -40,7 +42,8 @@ INSERT INTO `User_Room` (`id`, `user_id`, `room_id`) VALUES
                                                          (36,	31,	35),
                                                          (37,	31,	36),
                                                          (38,	31,	39),
-                                                         (39,	43,	35);
+                                                         (39,	43,	35),
+                                                         (40,	43,	33);
 
 DROP TABLE IF EXISTS `Users`;
 CREATE TABLE `Users` (
@@ -55,7 +58,8 @@ CREATE TABLE `Users` (
 INSERT INTO `Users` (`id`, `username`, `password`, `admin`, `email`) VALUES
                                                                          (31,	'nass',	'nass',	1,	'waitingemail@noreply.com'),
                                                                          (35,	'amaury',	'Sky@900',	1,	'amauryfranssen@gmail.com'),
-                                                                         (43,	'amo',	'Sky@900',	0,	'waiting@noemail.com');
+                                                                         (43,	'amo',	'Sky@900',	0,	'waiting@noemail.com'),
+                                                                         (44,	'khalifa',	'khalifa',	0,	'waiting@email.com');
 
 SET NAMES utf8mb4;
 
@@ -75,4 +79,9 @@ CREATE TABLE `messages` (
                             CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `Rooms` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 2023-12-01 22:37:41
+INSERT INTO `messages` (`id`, `room_id`, `user_id`, `username`, `content`, `created_at`, `Status`) VALUES
+                                                                                                       (66,	33,	31,	'nass',	'hello',	'2023-12-01 23:01:25',	NULL),
+                                                                                                       (67,	33,	31,	'nass',	'hi',	'2023-12-01 23:01:55',	NULL),
+                                                                                                       (68,	33,	31,	'nass',	'bonjour',	'2023-12-01 23:05:54',	NULL);
+
+-- 2023-12-10 22:55:39
