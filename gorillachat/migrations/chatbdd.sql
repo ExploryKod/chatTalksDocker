@@ -23,28 +23,6 @@ INSERT INTO `Rooms` (`id`, `name`, `description`, `private`) VALUES
                                                                  (40,	'ramen',	'Cuisine Japonaise',	0),
                                                                  (41,	'Sénégale',	'Dakar',	0);
 
-DROP TABLE IF EXISTS `User_Room`;
-CREATE TABLE `User_Room` (
-                             `id` int NOT NULL AUTO_INCREMENT,
-                             `user_id` int NOT NULL,
-                             `room_id` int NOT NULL,
-                             PRIMARY KEY (`id`),
-                             KEY `user_id` (`user_id`),
-                             KEY `room_id` (`room_id`),
-                             CONSTRAINT `room_id` FOREIGN KEY (`room_id`) REFERENCES `Rooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-                             CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `User_Room` (`id`, `user_id`, `room_id`) VALUES
-                                                         (31,	31,	33),
-                                                         (32,	35,	33),
-                                                         (35,	35,	35),
-                                                         (36,	31,	35),
-                                                         (37,	31,	36),
-                                                         (38,	31,	39),
-                                                         (39,	43,	35),
-                                                         (40,	43,	33);
-
 DROP TABLE IF EXISTS `Users`;
 CREATE TABLE `Users` (
                          `id` int NOT NULL AUTO_INCREMENT,
@@ -84,4 +62,26 @@ INSERT INTO `messages` (`id`, `room_id`, `user_id`, `username`, `content`, `crea
                                                                                                        (67,	33,	31,	'nass',	'hi',	'2023-12-01 23:01:55',	NULL),
                                                                                                        (68,	33,	31,	'nass',	'bonjour',	'2023-12-01 23:05:54',	NULL);
 
+
+DROP TABLE IF EXISTS `User_Room`;
+CREATE TABLE `User_Room` (
+                             `id` int NOT NULL AUTO_INCREMENT,
+                             `user_id` int NOT NULL,
+                             `room_id` int NOT NULL,
+                             PRIMARY KEY (`id`),
+                             KEY `user_id` (`user_id`),
+                             KEY `room_id` (`room_id`),
+                             CONSTRAINT `room_id` FOREIGN KEY (`room_id`) REFERENCES `Rooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+                             CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `User_Room` (`id`, `user_id`, `room_id`) VALUES
+                                                         (31,	31,	33),
+                                                         (32,	35,	33),
+                                                         (35,	35,	35),
+                                                         (36,	31,	35),
+                                                         (37,	31,	36),
+                                                         (38,	31,	39),
+                                                         (39,	43,	35),
+                                                         (40,	43,	33);
 -- 2023-12-10 22:55:39

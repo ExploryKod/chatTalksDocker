@@ -3,16 +3,17 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
-	"github.com/go-chi/jwtauth/v5"
-	"github.com/go-sql-driver/mysql"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/go-sql-driver/mysql"
 )
 
 type Handler struct {
@@ -39,13 +40,22 @@ func main() {
 	//}
 
 	conf := mysql.Config{
-		User:                 "root",
-		Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
+		User:                 os.Getenv("MYSQL_ADDON_USER"),
+		Passwd:               os.Getenv("MYSQL_ADDON_PASSWORD"),
 		Net:                  "tcp",
-		Addr:                 "database:3306",
-		DBName:               os.Getenv("MARIADB_DATABASE"),
+		Addr:                 os.Getenv("MYSQL_ADDON_HOST"),
+		DBName:               os.Getenv("MYSQL_ADDON_DB"),
 		AllowNativePasswords: true,
 	}
+
+	// conf := mysql.Config{
+	// 	User:                 "root",
+	// 	Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
+	// 	Net:                  "tcp",
+	// 	Addr:                 "database:3306",
+	// 	DBName:               os.Getenv("MARIADB_DATABASE"),
+	// 	AllowNativePasswords: true,
+	// }
 
 	db, err := sql.Open("mysql", conf.FormatDSN())
 	if err != nil {
