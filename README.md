@@ -27,7 +27,7 @@ Au cas où l'app ne se lance pas, aller manuellement le faire :
 ```
 
 ```
- go run .
+ docker exec -it go-api sh -c "go run ."
 ```
 
 
