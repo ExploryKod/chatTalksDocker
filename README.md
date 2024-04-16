@@ -7,16 +7,56 @@ API en ligne : https://go-chat-docker.onrender.com/
 
 ## Installations
 
+L'app se situe dans le dossier `gorillachat`
+
+### BDD
+
+1. Vérifiez que vous avez bien une BDD fonctionnelle en local ou utilisez :
+- Celle qui sera créé par docker via notre configuration
+- Ou la BDD de l'API en ligne (elle ne sera pas fonctionnelle éternellement).
+
+Passé le jour de l'évaluation, pour utiliser la BDD en ligne, il faudra nous demander le contenu du .env.
+
+2. remplissez le .env avec vos propre variables de bdd et mettez à jour la configuration dans gorillachat/main.go
+
+Exemple de bdd:
+- Serveur: database
+- Utilisateur: root
+- Mot de passe: password
+- Nom de la base de donnée: chabdd
+
+Créer ce .env à la racine du projet :
+
+```
+MARIADB_ROOT_PASSWORD=password
+MARIADB_DATABASE=chatbdd
+# GOOS=darwin
+# GOARCH=arm64
+GOOS=linux
+GOARCH=amd64
+PORT=8000
+
+MYSQL_ADDON_HOST=database:3306
+MYSQL_ADDON_DB=chatbdd
+MYSQL_ADDON_USER=root
+MYSQL_ADDON_PASSWORD=password
+```
+
+Ici c'est la base de donnée créer dans les conteneurs docker: pour utiliser la vôtre, remplacer les variables.
+La connexion à la BDD se configure dans gorillachat/main.go 
+
+Puis il faut lancer docker et les commandes docker.
+
 ### Pour le lancer en utilisant les scripts: 
 
 Dans un terminal bash : 
 
-1. Monter un conteneur docker puis lancer l'app
+#### Monter un conteneur docker puis lancer l'app
 ```
  ./enable_run.sh start
 ```
 
-Au cas où l'app ne se lance pas, aller manuellement le faire : 
+#### Au cas où l'app ne se lance pas, aller manuellement le faire : 
 
 ```
  cd gorillachat 
@@ -29,13 +69,6 @@ Au cas où l'app ne se lance pas, aller manuellement le faire :
 ```
  docker exec -it go-api sh -c "go run ."
 ```
-
-
-Aller ensuite consulter la BDD sur: localhost:8080
-- Serveur: database
-- Utilisateur: root
-- Mot de passe: password
-- Nom de le base de donnée: chabdd
 
 ***Dev Local sans docker*** en allant dans gorillachat (et non depuis la racine) : 
 
