@@ -11,13 +11,19 @@ L'app se situe dans le dossier `gorillachat`
 
 ### BDD
 
-1. Vérifiez que vous avez bien une BDD fonctionnelle en local ou utilisez :
+1. Dump
+Le dump de la bdd se trouve dans migrations/chatbdd.sql. 
+Importez ce dump dans votre bdd custom ou dans celle créer par docker si elle ne se charge pas automatiquement.
+
+2. Vérifiez que vous avez bien une BDD fonctionnelle en local ou utilisez :
 - Celle qui sera créé par docker via notre configuration
 - Ou la BDD de l'API en ligne (elle ne sera pas fonctionnelle éternellement).
 
 Passé le jour de l'évaluation, pour utiliser la BDD en ligne, il faudra nous demander le contenu du .env.
 
-2. remplissez le .env avec vos propre variables de bdd et mettez à jour la configuration dans gorillachat/main.go
+3. Variables d'environnements
+
+Remplissez le .env avec vos propre variables de bdd et mettez à jour la configuration dans gorillachat/main.go
 
 Exemple de bdd:
 - Serveur: database
