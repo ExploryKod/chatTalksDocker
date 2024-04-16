@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -81,22 +80,6 @@ func main() {
 		Todos     []Todo
 	}
 
-	//http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	//	data := TodoPageData{
-	//		PageTitle: "My TODO list",
-	//		Todos: []Todo{
-	//			{Title: "Task 1", Done: false},
-	//			{Title: "Task 2", Done: true},
-	//			{Title: "Task 3", Done: true},
-	//		},
-	//	}
-	//	err := tmpl.Execute(w, data)
-	//	if err != nil {
-	//		return
-	//	}
-	//})
-	//http.ListenAndServe(":80", nil)
-
 	handler := &Handler{
 		chi.NewRouter(),
 		store,
@@ -143,22 +126,6 @@ func main() {
 
 	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(wsServer, w, r)
-	})
-
-	tmpl := template.Must(template.ParseFiles("./layout.html"))
-	handler.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		data := TodoPageData{
-			PageTitle: "My TODO list",
-			Todos: []Todo{
-				{Title: "Task 1", Done: false},
-				{Title: "Task 2", Done: true},
-				{Title: "Task 3", Done: true},
-			},
-		}
-		err := tmpl.Execute(w, data)
-		if err != nil {
-			return
-		}
 	})
 
 	server := &http.Server{

@@ -16,6 +16,13 @@ COPY ./gorillachat .
 #RUN apt-get update
 #RUN apt-get install nano -y
 
+#ENV MYSQL_ADDON_HOST=bsgmzsx3etgjzeywrgbb-mysql.services.clever-cloud.com:3306
+#ENV MYSQL_ADDON_DB=bsgmzsx3etgjzeywrgbb
+#ENV MYSQL_ADDON_USER=udds4bjysjqdatqk
+#ENV MYSQL_ADDON_PORT=3306
+#ENV MYSQL_ADDON_PASSWORD=n4dmfb2mx7iaZlQsidHe
+#ENV MYSQL_ADDON_URI=mysql://udds4bjysjqdatqk:n4dmfb2mx7iaZlQsidHe@bsgmzsx3etgjzeywrgbb-mysql.services.clever-cloud.com:3306/bsgmzsx3etgjzeywrgbb
+
 RUN go mod download \
     && go mod verify \
     && go mod tidy \
