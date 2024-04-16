@@ -1,7 +1,5 @@
 # Chat Talks - Backend (en Go)
 
-#### Port utilisé ici: 8000 - les appel en frontend sont addressé à ce port. 
-
 #### Repo du front: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
 
 Site en ligne (frontend) : https://chat-talks-client.vercel.app 
