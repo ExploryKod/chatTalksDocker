@@ -2,7 +2,8 @@
 
 #### Repo du front: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
 
-Site en ligne (frontend) : https://chat-talks-client.vercel.app 
+Site en ligne (frontend) : https://chat-talks-client.vercel.app <br/>
+
 API en ligne : https://go-chat-docker.onrender.com/
 
 ## Installations
@@ -11,11 +12,12 @@ L'app se situe dans le dossier `gorillachat`
 
 ### BDD
 
-1. Dump
+1. Dump <br/>
+
 Le dump de la bdd se trouve dans migrations/chatbdd.sql. 
 Importez ce dump dans votre bdd custom ou dans celle créer par docker si elle ne se charge pas automatiquement.
 
-2. Vérifiez que vous avez bien une BDD fonctionnelle en local ou utilisez :
+2. Vérifiez que vous avez bien une BDD fonctionnelle en local ou utilisez :<br/>
 - Celle qui sera créé par docker via notre configuration
 - Ou la BDD de l'API en ligne (elle ne sera pas fonctionnelle éternellement).
 
@@ -31,7 +33,7 @@ Exemple de bdd:
 - Mot de passe: password
 - Nom de la base de donnée: chabdd
 
-Créer ce .env à la racine du projet :
+Créer ce fichier `.env` à la racine du projet :
 
 ```
 MARIADB_ROOT_PASSWORD=password
