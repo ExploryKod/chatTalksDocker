@@ -6,6 +6,8 @@ Site en ligne (frontend) : https://chat-talks-client.vercel.app <br/>
 
 API en ligne : https://go-chat-docker.onrender.com/
 
+Repo de l'API en ligne : https://github.com/ExploryKod/go-chat-docker
+
 ## Installations
 
 L'app se situe dans le dossier `gorillachat`
