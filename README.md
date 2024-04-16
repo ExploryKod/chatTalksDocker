@@ -4,17 +4,34 @@
 
 #### Repo du front: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
 
-## Pour le lancer en allant dans go_app:
+Site en ligne (frontend) : https://chat-talks-client.vercel.app 
+API en ligne : https://go-chat-docker.onrender.com/
 
-En local il est trés intéressant d'utiliser ***air*** pour le live reloading: 
-<a href="https://github.com/cosmtrek/air">Voir la doc ici pour installer air</a> 
+## Installations
 
-Je ne l'ai pas intégrer au docker.
+### Pour le lancer en utilisant les scripts: 
 
-***Avec docker*** depuis la racine (mais il faudra le remonté à chaque changement de code) 
+Dans un terminal bash : 
+
+1. Monter un conteneur docker puis lancer l'app
 ```
-docker compose up -d --build
+ ./enable_run.sh start
 ```
+
+Au cas où l'app ne se lance pas, aller manuellement le faire : 
+
+```
+ cd gorillachat 
+```
+
+```
+ docker compose up -d --build
+```
+
+```
+ go run .
+```
+
 
 Aller ensuite consulter la BDD sur: localhost:8080
 - Serveur: database
@@ -22,18 +39,17 @@ Aller ensuite consulter la BDD sur: localhost:8080
 - Mot de passe: password
 - Nom de le base de donnée: chabdd
 
-***Dev Local sans docker*** en allant dans go_app (et non depuis la racine) : 
-! La BDD ne sera pas disponible et les requêtes ne seront donc pas valide > fix en cours.
+***Dev Local sans docker*** en allant dans gorillachat (et non depuis la racine) : 
 
 ```
 go mod tidy
 ```
 
-```shell
-go run main/main.go
+```sh
+go run .
 ```
 
-***Dev en version turbo*** (live reloading) avec air (aprés avoir get le package) et sur go_app: 
+***Dev en version turbo*** (live reloading) avec air (aprés avoir get le package) et sur gorillachat: 
 
 - Générer la config / default : `air init`
 - Puis : `air` 
