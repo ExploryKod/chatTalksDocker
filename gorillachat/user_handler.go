@@ -92,7 +92,7 @@ func (h *Handler) LoginHandler() http.HandlerFunc {
 			roleStr := strconv.Itoa(user.Admin)
 			email := user.Email
 
-			response := map[string]string{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "admin": roleStr, "email": email}
+			response := map[string]any{"message": "Vous êtes bien connecté", "redirect": "/", "token": token, "admin": roleStr, "email": email, "user": user}
 			h.jsonResponse(w, http.StatusOK, response)
 		} else if user.Password != password {
 			// Failed login

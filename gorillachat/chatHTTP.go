@@ -13,6 +13,7 @@ type RoomItem struct {
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
 	Clients     map[string]*Client `json:"-"`
+	Private     int                `json:"private"`
 }
 
 type MessageItem struct {
@@ -22,6 +23,17 @@ type MessageItem struct {
 	UserID    int    `json:"user_id"`
 	RoomID    int    `json:"room_id"`
 	CreatedAt string `json:"created_at"`
+	Action    string `json:"action"`
+}
+
+type DiscussionItem struct {
+	ID          int         `json:"id"`
+	UserID      int         `json:"user_id"`
+	RoomID      int         `json:"room_id"`
+	JoinDate    string      `json:"join_date"`
+	User        UserItem    `json:"user"`
+	Room        RoomItem    `json:"room"`
+	LastMessage MessageItem `json:"last_message"`
 }
 
 type UserStoreInterface interface {
@@ -44,4 +56,6 @@ type UserStoreInterface interface {
 	GetMessagesFromRoom(id int) ([]MessageItem, error)
 	DeleteMessagesByRoomId(id int) error
 	CountMessagesSent() (int, error)
+	GetUserDiscussions(id int) ([]DiscussionItem, error)
+	DeleteUserRoom(userid int, roomid int) error
 }

@@ -43,6 +43,7 @@ func (t *UserStore) GetMessagesFromRoom(id int) ([]MessageItem, error) {
 		if err = rows.Scan(&message.ID, &message.RoomID, &message.UserID, &message.Username, &message.Content, &message.CreatedAt); err != nil {
 			return []MessageItem{}, err
 		}
+		message.Action = "send-message"
 		messages = append(messages, message)
 	}
 

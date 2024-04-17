@@ -52,14 +52,6 @@ func (t *UserStore) GetRoomById(id int) (RoomItem, error) {
 	return room, nil
 }
 
-func (t *UserStore) AddUserToRoom(roomID int, userID int) error {
-	_, err := t.DB.Exec("INSERT INTO User_Room (user_id, room_id) VALUES (?, ?)", userID, roomID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (t *UserStore) GetUsersFromRoom(roomID int) ([]UserItem, error) {
 	var users []UserItem
 

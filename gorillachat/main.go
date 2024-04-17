@@ -39,23 +39,23 @@ func main() {
 	//	AllowNativePasswords: true,
 	//}
 
+	//conf := mysql.Config{
+	//	User:                 os.Getenv("MYSQL_ADDON_USER"),
+	//	Passwd:               os.Getenv("MYSQL_ADDON_PASSWORD"),
+	//	Net:                  "tcp",
+	//	Addr:                 os.Getenv("MYSQL_ADDON_HOST"),
+	//	DBName:               os.Getenv("MYSQL_ADDON_DB"),
+	//	AllowNativePasswords: true,
+	//}
+
 	conf := mysql.Config{
-		User:                 os.Getenv("MYSQL_ADDON_USER"),
-		Passwd:               os.Getenv("MYSQL_ADDON_PASSWORD"),
+		User:                 "root",
+		Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
 		Net:                  "tcp",
-		Addr:                 os.Getenv("MYSQL_ADDON_HOST"),
-		DBName:               os.Getenv("MYSQL_ADDON_DB"),
+		Addr:                 "database:3306",
+		DBName:               os.Getenv("MARIADB_DATABASE"),
 		AllowNativePasswords: true,
 	}
-
-	// conf := mysql.Config{
-	// 	User:                 "root",
-	// 	Passwd:               os.Getenv("MARIADB_ROOT_PASSWORD"),
-	// 	Net:                  "tcp",
-	// 	Addr:                 "database:3306",
-	// 	DBName:               os.Getenv("MARIADB_DATABASE"),
-	// 	AllowNativePasswords: true,
-	// }
 
 	db, err := sql.Open("mysql", conf.FormatDSN())
 	if err != nil {
@@ -139,6 +139,8 @@ func main() {
 		r.Post("/send-message", handler.CreateMessageHandler)
 		r.Get("/chat/messages/{id}", handler.GetMessageHandler)
 		r.Get("/messages/room/delete-history/{id}", handler.DeleteMessageFromRoomHandler())
+		r.Get("/user/discussions/{id}", handler.GetUserDiscussionsHandler())
+		r.Delete("/user/discussion/delete/{userid}/{roomid}", handler.DeleteUserRoomHandler())
 	})
 
 	handler.Get("/ws", func(w http.ResponseWriter, r *http.Request) {

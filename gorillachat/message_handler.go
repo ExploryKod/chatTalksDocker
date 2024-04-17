@@ -18,13 +18,11 @@ func (h *Handler) CreateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	roomIDInt, _ := strconv.Atoi(roomID)
 
 	if sender.Username != "" && content != "" && roomID != "" {
-		// TODO : add a limit of messages per room or accept all messages
-		//messageID, err := h.Store.AddMessage(MessageItem{Content: content, UserID: sender.ID, RoomID: roomIDInt, Username: sender.Username})
-		//if err != nil {
-		//	http.Error(w, err.Error(), http.StatusInternalServerError)
-		//	return
-		//}
-		messageID := 0
+		messageID, err := h.Store.AddMessage(MessageItem{Content: content, UserID: sender.ID, RoomID: roomIDInt, Username: sender.Username})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		h.jsonResponse(w, http.StatusOK, map[string]interface{}{"message": "Message sent", "roomID": roomIDInt, "messageID": messageID, "userID": sender.ID})
 	} else if sender.Username == "" {
 		http.Error(w, "No user with this id found", http.StatusBadRequest)
