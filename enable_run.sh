@@ -19,4 +19,4 @@ if [ "$1" == "clean" ]; then
   docker-compose up -d --build
 fi
 
-docker exec -it go-api sh -c "go run main.go"
+docker exec -it go-api sh -c "go run ."
