@@ -1,6 +1,6 @@
 # Chat Talks - Backend (en Go)
 
-#### Repo du front: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
+#### Repo du site frontend: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
 
 Site en ligne (frontend) : https://chat-talks-client.vercel.app <br/>
 
