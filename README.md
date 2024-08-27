@@ -2,11 +2,13 @@
 
 #### Repo du site frontend: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
 
-Site en ligne (frontend) : https://chat-talks-client.vercel.app <br/>
+#### Repo de l'app réalisée avec React Native: <a href="https://github.com/ExploryKod/chatTalksMobile">voir ici</a>
 
-API en ligne : https://go-chat-docker.onrender.com/
+#### Site en ligne (frontend) : https://chat-talks-client.vercel.app <br/>
 
-Repo de l'API en ligne : https://github.com/ExploryKod/go-chat-docker
+#### API en ligne : https://go-chat-docker.onrender.com/
+
+### Repo de l'API en ligne (backend avec Go) : https://github.com/ExploryKod/go-chat-docker
 
 ## Installations
 
