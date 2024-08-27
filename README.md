@@ -1,5 +1,7 @@
 # Chat Talks - Backend (en Go)
 
+Projet visant à maîtriser la communication en temps réel avec les websockets dans le cadre de React et React Native avec Go pour le backend.
+
 #### Ce projet possèdent de nombreux repositories : 
 - backend du site de dev ou local (ici)
 - backend de l'API en ligne
