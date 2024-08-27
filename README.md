@@ -8,7 +8,7 @@
 
 #### API en ligne : https://go-chat-docker.onrender.com/
 
-### Repo de l'API en ligne (backend avec Go) : https://github.com/ExploryKod/go-chat-docker
+#### Repo de l'API en ligne (backend avec Go) : https://github.com/ExploryKod/go-chat-docker
 
 ## Installations
 
