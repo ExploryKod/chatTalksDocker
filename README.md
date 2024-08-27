@@ -1,5 +1,7 @@
 # Chat Talks - Backend (en Go)
 
+#### Ce projet possèdent de nombreux repository : backend du site de dev ou local (ici), backend de l'API en ligne, frontend avec React pour le site et React Native pour une app
+
 #### Repo du site frontend: <a href="https://github.com/ExploryKod/chatTalksClient">voir ici</a>
 
 #### Repo de l'app réalisée avec React Native: <a href="https://github.com/ExploryKod/chatTalksMobile">voir ici</a>
