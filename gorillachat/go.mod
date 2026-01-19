@@ -3,7 +3,7 @@ module github.com/gorillachat
 go 1.24.0
 
 require (
-	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/jwtauth/v5 v5.1.1
 	github.com/go-sql-driver/mysql v1.7.1
